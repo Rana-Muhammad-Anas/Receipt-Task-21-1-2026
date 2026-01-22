@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
+import firstAid from "../../public/first-aid.png";
+import consulting from "../../public/consulting.png";
+import laboratory from "../../public/laboratory.png";
+import xray from "../../public/xray.png";
+import mri from "../../public/mri.png";
+import therapy1 from "../../public/therapyiv.png";
+import therapy2 from "../../public/therapy-infu.png";
+import file from "../../public/file.png";
+import ambulance from "../../public/ambulance.png";
+import eye from "../../public/eye.png";
 
 const Receipt = () => {
+  const [activeTab, setActiveTab] = useState('OPD');
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => {
@@ -17,21 +28,22 @@ const Receipt = () => {
 
   // Initial services data
   const initialServices = [
-    { id: 1, name: "Laboratory", selected: false, price: 1000, description: "1000ml 3 Items" },
-    { id: 2, name: "X-RAY", selected: false, price: 800, description: "Digital X-Ray" },
-    { id: 3, name: "MRI", selected: false, price: 2500, description: "Full Body MRI" },
-    { id: 4, name: "Consultation", selected: false, price: 500, description: "Doctor Consultation" },
-    { id: 5, name: "IV Therapy", selected: false, price: 300, description: "100ml IV Direct Pain Killer" },
-    { id: 6, name: "IV Infusion", selected: false, price: 450, description: "500ml 2 Items" },
-    { id: 7, name: "Admission File", selected: false, price: 200, description: "Patient Admission" },
-    { id: 8, name: "Ambulance", selected: false, price: 1000, description: "Ambulance Service" },
+    { id: 1, name: "OPD", selected: false, price: 1000, description: "Full Body", icon : firstAid },
+    { id: 2, name: "Laboratory", selected: false, price: 1000, description: "1000ml 3 Items", icon : laboratory },
+    { id: 3, name: "X-RAY", selected: false, price: 800, description: "Digital X-Ray" , icon : xray},
+    { id: 4, name: "Consultation", selected: false, price: 500, description: "Doctor Consultation", icon : consulting },
+    { id: 5, name: "IV Therapy", selected: false, price: 300, description: "100ml IV Direct Pain Killer",icon : therapy1  },
+    { id: 6, name: "IV Infusion", selected: false, price: 450, description: "500ml 2 Items",icon : therapy2 },
+    { id: 7, name: "Admission File", selected: false, price: 200, description: "Patient Admission", icon: file },
+    { id: 8, name: "Ambulance", selected: false, price: 1000, description: "Ambulance Service", icon: ambulance },
     { id: 9, name: "Antenatal Card", selected: false, price: 150, description: "Antenatal Care" },
     { id: 10, name: "Audiology Test", selected: false, price: 350, description: "Hearing Test" },
     { id: 11, name: "Blood Transfusion", selected: false, price: 1200, description: "Blood Transfusion Service" },
     { id: 12, name: "Braces Retainer", selected: false, price: 1800, description: "Dental Braces" },
     { id: 13, name: "Ultra Sound", selected: false, price: 900, description: "Ultrasound Scan" },
-    { id: 14, name: "Eye Checkup", selected: false, price: 400, description: "Complete Eye Exam" },
+    { id: 14, name: "Eye Checkup", selected: false, price: 400, description: "Complete Eye Exam",icon: eye },
     { id: 15, name: "Dental Checkup", selected: false, price: 600, description: "Dental Examination" },
+    { id: 16, name: "MRI", selected: false, price: 2500, description: "Full Body MRI", icon: mri },
   ];
 
   const [services, setServices] = useState(initialServices);
@@ -54,12 +66,12 @@ const Receipt = () => {
   const returnAmount = isOverpaid ? Math.abs(balance) : 0;
 
   // Filter services based on search term
-  const filteredServices = searchTerm.trim() === "" 
-    ? services 
-    : services.filter(service => 
-        service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const filteredServices = searchTerm.trim() === ""
+    ? services
+    : services.filter(service =>
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   useEffect(() => {
     const selected = services.filter((service) => service.selected);
@@ -230,43 +242,44 @@ const Receipt = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-2 mt-3 print:mt-2">
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-600 text-sm">Receipt No:</span>
-                      <div>
-                        <input
-                          className={`w-32 px-2 py-1 border rounded text-gray-900 bg-[#edf9ff] text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none ${errors.receiptNo ? 'border-red-500' : 'border-gray-300'}`}
-                          value={receiptNo}
-                          onChange={handleReceiptNoChange}
-                          placeholder="Enter receipt no."
-                        />
-                        {errors.receiptNo && <p className="text-red-500 text-xs mt-1">{errors.receiptNo}</p>}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-600 text-sm">MR No:</span>
-                      <div>
-                        <input
-                          className={`w-32 px-2 py-1 border rounded text-gray-900 bg-[#edf9ff] text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none ${errors.mrNo ? 'border-red-500' : 'border-gray-300'}`}
-                          value={mrNo}
-                          onChange={handleMrNoChange}
-                          placeholder="Enter MR no."
-                        />
-                        {errors.mrNo && <p className="text-red-500 text-xs mt-1">{errors.mrNo}</p>}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
               {/* Patient Info */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 print:mb-2">
-                  Patient Information <span className="text-red-500">*</span>
-                </h3>
-                <div className="space-y-3 print:space-y-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:gap-2">
+                <div className="flex space justify-between ">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3 print:mb-2">
+                    Patient Information <span className="text-red-500">*</span>
+                  </h3>
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-600 text-sm">Receipt No:</span>
                     <div>
+                      <input
+                        className={`w-32 px-2 py-1 border rounded text-gray-900 bg-[#edf9ff] text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none ${errors.receiptNo ? 'border-red-500' : 'border-gray-300'}`}
+                        value={receiptNo}
+                        onChange={handleReceiptNoChange}
+                        placeholder="Enter receipt no."
+                      />
+                      {errors.receiptNo && <p className="text-red-500 text-xs mt-1">{errors.receiptNo}</p>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 my-1">
+                  <span className="text-gray-600 text-sm">MR No:</span>
+                  <div>
+                    <input
+                      className={`w-32 px-2 py-1 border rounded text-gray-900 bg-[#edf9ff] text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none ${errors.mrNo ? 'border-red-500' : 'border-gray-300'}`}
+                      value={mrNo}
+                      onChange={handleMrNoChange}
+                      placeholder="Enter MR no."
+                    />
+                    {errors.mrNo && <p className="text-red-500 text-xs mt-1">{errors.mrNo}</p>}
+                  </div>
+                </div>
+                <div className="space-y-3 print:space-y-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-5 print:gap-2">
+                    <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
                         Full Name <span className="text-red-500">*</span>
                       </label>
@@ -279,18 +292,20 @@ const Receipt = () => {
                       />
                       {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
-                    <div>
+                    <div className="col-span-1">
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Address <span className="text-red-500">*</span>
+                        Phone <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
-                        name="address"
-                        value={patientInfo.address}
+                        className={`w-full py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                        name="phone"
+                        value={patientInfo.phone}
                         onChange={handleInputChange}
-                        placeholder="Enter address"
+                        placeholder="11 digit phone number"
+                        type="tel"
+                        maxLength="11"
                       />
-                      {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 print:grid-cols-4 print:gap-2">
@@ -323,20 +338,53 @@ const Receipt = () => {
                       />
                       {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
                     </div>
-                    <div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-5">
+                    <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Phone <span className="text-red-500">*</span>
+                        Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                        name="address"
+                        value={patientInfo.address}
+                        onChange={handleInputChange}
+                        placeholder="Enter address"
+                      />
+                      {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+                    </div>
+
+                    <div className="col-span-1 ">
+                      <label className="block text-sm font-medium text-gray-700 print:text-black">
+                        City <span className="text-red-500">*</span>
                       </label>
                       <input
                         className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
-                        name="phone"
-                        value={patientInfo.phone}
+                        name="city"
+                        value={patientInfo.city}
                         onChange={handleInputChange}
-                        placeholder="11 digit phone number"
-                        type="tel"
-                        maxLength="11"
+                        placeholder="Enter City"
+                        type="name"
                       />
-                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                      {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 print:text-black">
+                        Panel
+                      </label>
+                      <select
+                        name="reference"
+                        value={patientInfo.reference}
+                        onChange={handleSelectChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
+                      >
+                        <option value="General Physician">General Physician</option>
+                        <option value="Dentist">Dentist</option>
+                        <option value="Ophthalmologist">Ophthalmologist</option>
+                        <option value="General Surgeon">General Surgeon</option>
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
@@ -359,7 +407,7 @@ const Receipt = () => {
               </div>
             </div>
 
-                                  {/* OPD Services */}
+            {/* OPD Services */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 print:shadow-none print:border print:p-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 print:mb-3">
                 <h3 className="text-xl font-bold text-gray-800 print:text-black">
@@ -413,75 +461,85 @@ const Receipt = () => {
               </div>
 
               {/* Scrollable container with fixed height */}
-              <div className="max-h-[200px] sm:max-h-[220px] md:max-h-[240px] overflow-y-auto pr-2 mb-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3 print:grid-cols-4 print:gap-2">
-                  {filteredServices.map((service) => (
-                    <div
-                      key={service.id}
-                      className={`p-2.5 sm:p-3 rounded-xl border-2 cursor-pointer transition-all duration-200 
+              <div className="grid grid-cols-5">
+                <div className="max-h-[200px] sm:max-h-[220px] md:max-h-[240px] overflow-y-auto pr-2 mb-4 col-span-2" style={{
+                  direction: "rtl",
+                }}>
+                  <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-2 gap-2.5 sm:gap-3 print:grid-cols-4 print:gap-2" style={{ direction: "ltr" }}>
+                    {filteredServices.map((service) => (
+                      <div
+                        key={service.id}
+                        className={`p-2.5 sm:p-3 rounded-xl border-2 cursor-pointer transition-all items-center duration-200 
                         hover:shadow-md active:scale-[0.98] min-h-[100px] sm:min-h-[110px] 
                         flex flex-col justify-between relative group print:min-h-[90px] print:p-2 ${service.selected
-                          ? "border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-md"
-                          : "border-gray-200 hover:border-blue-300 bg-white"
-                        }`}
-                      onClick={() => toggleService(service.id)}
-                    >
-                      {/* Toggle Indicator */}
-                      <div className="absolute -top-1.5 -right-1.5">
-                        <div
-                          className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shadow-md transition-all ${service.selected
-                            ? "bg-gradient-to-br from-blue-500 to-blue-600 scale-100"
-                            : "bg-gradient-to-br from-gray-200 to-gray-300 scale-90 group-hover:scale-100"
-                            }`}
-                        >
-                          {service.selected && (
-                            <svg
-                              className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="3"
-                                d="M5 13l4 4L19 7"
-                              ></path>
-                            </svg>
-                          )}
+                            ? "border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-md"
+                            : "border-gray-200 hover:border-blue-300 bg-white"
+                          }`}
+                        onClick={() => toggleService(service.id)}
+                      >
+                        {/* Toggle Indicator */}
+                        <div className="absolute -top-1.5 -right-1.5">
+                          <div
+                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shadow-md transition-all ${service.selected
+                              ? "bg-gradient-to-br from-blue-500 to-blue-600 scale-100"
+                              : "bg-gradient-to-br from-gray-200 to-gray-300 scale-90 group-hover:scale-100"
+                              }`}
+                          >
+                            {service.selected && (
+                              <svg
+                                className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="3"
+                                  d="M5 13l4 4L19 7"
+                                ></path>
+                              </svg>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Service Content */}
-                      <div className="flex-1">
-                        <div className="mb-1.5">
-                          <h4 className="font-bold text-gray-800 text-xs sm:text-sm print:text-xs leading-tight line-clamp-2">
-                            {service.name}
-                          </h4>
+                        {/* Service Content */}
+                        <div className="flex-1 ">
+                          <div className="mb-1.5">
+                            <img  className="w-12 h-10" src={service.icon} alt="" />
+                            <h4 className="font-bold text-gray-800 text-xs sm:text-sm print:text-xs leading-tight line-clamp-2">
+                              {service.name}
+                            </h4>
+                          </div>
+                          <p className="text-[10px] xs:text-xs text-gray-600 print:text-xs leading-tight line-clamp-2">
+                            {service.description}
+                          </p>
                         </div>
-                        <p className="text-[10px] xs:text-xs text-gray-600 print:text-xs leading-tight line-clamp-2">
-                          {service.description}
-                        </p>
-                      </div>
 
-                      <div className="mt-2 pt-2 border-t border-gray-100">
-                        <div className="flex justify-between items-center">
-                          <span className="font-bold text-blue-600 text-xs sm:text-sm print:text-xs">
-                            Rs.{service.price}
-                          </span>
-                          {service.selected && (
-                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                              Selected
+                        <div className="mt-2 pt-2 border-t border-gray-100">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-blue-600 text-xs sm:text-sm print:text-xs">
+                              Rs.{service.price}
                             </span>
-                          )}
+                            {service.selected && (
+                              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                                Selected
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-
-                      <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-blue-200 transition-colors pointer-events-none"></div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+                <div className="col-span-3 max-h-[200px] sm:max-h-[220px] md:max-h-[240px] overflow-y-auto pr-2 mb-4 border-2 border-black rounded-lg">
+                  <div className="col-span-2">
+                    selected services
+                  </div>
+ 
+ 
+ </div>
               </div>
 
               {/* Action Buttons */}
@@ -522,6 +580,51 @@ const Receipt = () => {
 
           {/* Right Column - Payment Summary */}
           <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4">
+
+
+            <div className="max-h-[calc(100vh-100px)] overflow-y-auto bg-white p-4 rounded-xl sm:rounded-2xl">
+              <div className="max-w-6xl mx-auto bg-blue-100 px-3 py-5 rounded">
+                {/* Tabs */}
+                <div className="flex space-x-1 border-b mb-6">
+                  {['OPD', 'IPD', 'Tokens'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-4 py-2 font-medium ${activeTab === tab ? 'border-b-2 bg-white border-blue-500 text-blue-800' : 'text-gray-500'}`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Content */}
+                <div className="bg-white rounded-lg shadow p-4">
+                  {activeTab === 'OPD' && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-4">OPD Tab</h2>
+                      <p className="text-gray-600">OPD data goes here</p>
+                      {/* Add your OPD data table or content here */}
+                    </div>
+                  )}
+
+                  {activeTab === 'IPD' && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-4">IPD Tab</h2>
+                      <p className="text-gray-600">IPD data goes here</p>
+                      {/* Add your IPD data table or content here */}
+                    </div>
+                  )}
+
+                  {activeTab === 'Tokens' && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-4">Tokens Tab</h2>
+                      <p className="text-gray-600">Tokens data goes here</p>
+                      {/* Add your Tokens data table or content here */}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             {/* Payment Summary Card */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 sticky top-4 print:static print:shadow-none print:border print:p-4">
               <h3 className="text-xl font-bold text-gray-800 mb-4 sm:mb-6 print:text-black print:mb-3">
@@ -623,23 +726,30 @@ const Receipt = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-2 sm:space-y-3 print:hidden">
+              <div className="grid grid-cols-2 gap-2 print:hidden">
                 <button
-                  className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:opacity-90 transition-opacity text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handlePrint}
-                >
-                  Print Receipt
-                </button>
-                <button
-                  className="w-full py-2.5 sm:py-3 bg-gray-100 text-gray-800 font-medium rounded-xl hover:bg-gray-200 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-2 px-3
+               bg-gray-100 text-gray-800 font-medium rounded-lg
+               hover:bg-gray-200 transition-colors
+               text-sm
+               disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleSaveExit}
                 >
                   Save & Exit
                 </button>
-                <button className="w-full py-2.5 sm:py-3 border-2 border-blue-600 text-blue-600 font-medium rounded-xl hover:bg-blue-50 transition-colors text-sm sm:text-base">
-                  Modify Selection
+
+                <button
+                  className="w-full py-2 px-3
+               bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-lg
+               hover:opacity-90 transition-opacity
+               text-sm
+               disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handlePrint}
+                >
+                  Print Receipt
                 </button>
               </div>
+
 
               {/* Validation Summary */}
               {(() => {
