@@ -4,11 +4,8 @@ import consulting from "../../public/consulting.png";
 import laboratory from "../../public/laboratory.png";
 import xray from "../../public/xray.png";
 import mri from "../../public/mri.png";
-import therapy1 from "../../public/therapyiv.png";
-import therapy2 from "../../public/therapy-infu.png";
-import file from "../../public/file.png";
-import ambulance from "../../public/ambulance.png";
 import eye from "../../public/eye.png";
+import teeth from "../../public/teeth.png";
 
 const Receipt = () => {
   const [activeTab, setActiveTab] = useState('OPD');
@@ -25,25 +22,17 @@ const Receipt = () => {
   const [receiptNo, setReceiptNo] = useState(""); // State for receipt number
   const [mrNo, setMrNo] = useState(""); // State for MR number
   const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [isOpen, setIsOpen] = useState(false);     // Toggle Effect for Selected Services
 
   // Initial services data
   const initialServices = [
-    { id: 1, name: "OPD", selected: false, price: 1000, description: "Full Body", icon : firstAid },
-    { id: 2, name: "Laboratory", selected: false, price: 1000, description: "1000ml 3 Items", icon : laboratory },
-    { id: 3, name: "X-RAY", selected: false, price: 800, description: "Digital X-Ray" , icon : xray},
-    { id: 4, name: "Consultation", selected: false, price: 500, description: "Doctor Consultation", icon : consulting },
-    { id: 5, name: "IV Therapy", selected: false, price: 300, description: "100ml IV Direct Pain Killer",icon : therapy1  },
-    { id: 6, name: "IV Infusion", selected: false, price: 450, description: "500ml 2 Items",icon : therapy2 },
-    { id: 7, name: "Admission File", selected: false, price: 200, description: "Patient Admission", icon: file },
-    { id: 8, name: "Ambulance", selected: false, price: 1000, description: "Ambulance Service", icon: ambulance },
-    { id: 9, name: "Antenatal Card", selected: false, price: 150, description: "Antenatal Care" },
-    { id: 10, name: "Audiology Test", selected: false, price: 350, description: "Hearing Test" },
-    { id: 11, name: "Blood Transfusion", selected: false, price: 1200, description: "Blood Transfusion Service" },
-    { id: 12, name: "Braces Retainer", selected: false, price: 1800, description: "Dental Braces" },
-    { id: 13, name: "Ultra Sound", selected: false, price: 900, description: "Ultrasound Scan" },
-    { id: 14, name: "Eye Checkup", selected: false, price: 400, description: "Complete Eye Exam",icon: eye },
-    { id: 15, name: "Dental Checkup", selected: false, price: 600, description: "Dental Examination" },
-    { id: 16, name: "MRI", selected: false, price: 2500, description: "Full Body MRI", icon: mri },
+    { id: 1, name: "OPD", selected: false, price: 1000, description: "Full Body", icon: firstAid },
+    { id: 2, name: "Laboratory", selected: false, price: 1000, description: "1000ml 3 Items", icon: laboratory },
+    { id: 3, name: "MRI", selected: false, price: 2500, description: "Full Body MRI", icon: mri },
+    { id: 4, name: "Consultation", selected: false, price: 500, description: "Doctor Consultation", icon: consulting },
+    { id: 5, name: "X-RAY", selected: false, price: 800, description: "Digital X-Ray", icon: xray },
+    { id: 6, name: "Eye Checkup", selected: false, price: 400, description: "Complete Eye Exam", icon: eye },
+    { id: 7, name: "Dental Checkup", selected: false, price: 600, description: "Dental Examination", icon: teeth },
   ];
 
   const [services, setServices] = useState(initialServices);
@@ -56,6 +45,8 @@ const Receipt = () => {
     gender: "",
     phone: "",
     reference: "General Physician",
+    panel: "",
+    city: "",
   });
 
   const totalAmount = selectedServices.reduce((sum, service) => sum + service.price, 0);
@@ -104,6 +95,9 @@ const Receipt = () => {
       setErrors({ ...errors, [name]: null });
     }
   };
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
 
   const handleReceiptNoChange = (e) => {
     setReceiptNo(e.target.value);
@@ -120,7 +114,7 @@ const Receipt = () => {
   };
 
   const handleSelectChange = (e) => {
-    setPatientInfo({ ...patientInfo, reference: e.target.value });
+    setPatientInfo({ ...patientInfo, [e.target.name]: e.target.value });
   };
 
   const handleDiscountChange = (e) => {
@@ -356,7 +350,7 @@ const Receipt = () => {
 
                     <div className="col-span-1 ">
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        City <span className="text-red-500">*</span>
+                        City
                       </label>
                       <input
                         className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
@@ -375,8 +369,8 @@ const Receipt = () => {
                         Panel
                       </label>
                       <select
-                        name="reference"
-                        value={patientInfo.reference}
+                        name="panel"
+                        value={patientInfo.panel}
                         onChange={handleSelectChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
                       >
@@ -417,7 +411,6 @@ const Receipt = () => {
                   {selectedServices.length} services selected
                 </div>
               </div>
-
               {errors.services && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-600 text-sm font-medium">{errors.services}</p>
@@ -507,7 +500,7 @@ const Receipt = () => {
                         {/* Service Content */}
                         <div className="flex-1 ">
                           <div className="mb-1.5">
-                            <img  className="w-12 h-10" src={service.icon} alt="" />
+                            <img className="w-12 h-10" src={service.icon} alt="" />
                             <h4 className="font-bold text-gray-800 text-xs sm:text-sm print:text-xs leading-tight line-clamp-2">
                               {service.name}
                             </h4>
@@ -535,11 +528,42 @@ const Receipt = () => {
                 </div>
                 <div className="col-span-3 max-h-[200px] sm:max-h-[220px] md:max-h-[240px] overflow-y-auto pr-2 mb-4 border-2 border-black rounded-lg">
                   <div className="col-span-2">
-                    selected services
+                    <div className="mb-4 sm:mb-6 print:mb-3">
+                      <h4 className="font-medium text-gray-700 mb-2 sm:mb-3 print:text-black text-center">
+                        Selected Services
+                      </h4>
+                      <div className="max-h-48 sm:max-h-64">
+                        {selectedServices.length > 0 ? (
+                          <div className="space-y-1 sm:space-y-2">
+                            {selectedServices.map((service, index) => (
+                              <div
+                                key={service.id}
+                                className="flex justify-between items-center py-2 border-b border-gray-100 text-sm sm:text-base print:text-sm"
+                              >
+                                <div className="truncate max-w-[60%]">
+                                  <span className="ml-2 text-xs text-gray-500 px-2">
+                                    #{index + 1}
+                                  </span>
+                                  <span className="font-medium text-gray-800">
+                                    {service.name}
+                                  </span>
+
+                                </div>
+                                <span className="font-medium whitespace-nowrap">Rs.{service.price}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-4 text-gray-500 text-sm sm:text-base">
+                            No services selected
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
- 
- 
- </div>
+
+
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -580,10 +604,8 @@ const Receipt = () => {
 
           {/* Right Column - Payment Summary */}
           <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4">
-
-
             <div className="max-h-[calc(100vh-100px)] overflow-y-auto bg-white p-4 rounded-xl sm:rounded-2xl">
-              <div className="max-w-6xl mx-auto bg-blue-100 px-3 py-5 rounded">
+              <div className=" mx-auto bg-blue-100 px-3 py-5 rounded">
                 {/* Tabs */}
                 <div className="flex space-x-1 border-b mb-6">
                   {['OPD', 'IPD', 'Tokens'].map((tab) => (
@@ -598,9 +620,9 @@ const Receipt = () => {
                 </div>
 
                 {/* Content */}
-                <div className="bg-white rounded-lg shadow p-4">
+                <div className="bg-white rounded-lg shadow p-4 h-[calc(46vh-100px)] overflow-y-auto">
                   {activeTab === 'OPD' && (
-                    <div>
+                    <div className="">
                       <h2 className="text-lg font-semibold mb-4">OPD Tab</h2>
                       <p className="text-gray-600">OPD data goes here</p>
                       {/* Add your OPD data table or content here */}
@@ -627,47 +649,129 @@ const Receipt = () => {
             </div>
             {/* Payment Summary Card */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 sticky top-4 print:static print:shadow-none print:border print:p-4">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 sm:mb-6 print:text-black print:mb-3">
-                Payment Summary
-              </h3>
-
-              {/* Selected Services Table */}
-              <div className="mb-4 sm:mb-6 print:mb-3">
-                <h4 className="font-medium text-gray-700 mb-2 sm:mb-3 print:text-black">
-                  Selected Services
-                </h4>
-                <div className="max-h-48 sm:max-h-64 overflow-y-auto">
-                  {selectedServices.length > 0 ? (
-                    <div className="space-y-1 sm:space-y-2">
-                      {selectedServices.map((service, index) => (
-                        <div
-                          key={service.id}
-                          className="flex justify-between items-center py-2 border-b border-gray-100 text-sm sm:text-base print:text-sm"
-                        >
-                          <div className="truncate max-w-[60%]">
-                            <span className="font-medium text-gray-800">
-                              {service.name}
-                            </span>
-                            <span className="ml-2 text-xs text-gray-500">
-                              #{index + 1}
-                            </span>
-                          </div>
-                          <span className="font-medium whitespace-nowrap">Rs.{service.price}</span>
+              {/* <div className="flex justify-between">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 sm:mb-6 print:text-black print:mb-3">
+                  Payment Summary
+                </h3>
+                <button className="text-green-800" onClick={handleToggle}> Selected Services </button>
+                {isOpen ? <div>
+                  <div className="mb-4 sm:mb-6 print:mb-3">
+                    <div className="max-h-40 sm:max-h-50 overflow-y-auto">
+                      {selectedServices.length > 0 ? (
+                        <div className="space-y-1 sm:space-y-2">
+                          {selectedServices.map((service, index) => (
+                            <div
+                              key={service.id}
+                              className="flex justify-between items-center py-2 border-b border-gray-100 text-sm sm:text-base print:text-sm"
+                            >
+                              <div className="truncate max-w-[60%]">
+                                <span className="ml-2 text-xs text-gray-500 px-2">
+                                  #{index + 1}
+                                </span>
+                                <span className="font-medium text-gray-800">
+                                  {service.name}
+                                </span>
+                              </div>
+                              <span className="font-medium whitespace-nowrap">Rs.{service.price}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        <div className="text-center py-4 text-gray-500 text-sm sm:text-base">
+                          No services selected
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-center py-4 text-gray-500 text-sm sm:text-base">
-                      No services selected
-                    </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                </div> : ""}
+             </div> */}
 
+
+
+
+
+
+<div className="flex justify-between items-start mb-4">
+  <h3 className="text-xl font-bold text-gray-800 sm:mb-6 print:text-black print:mb-3">
+    Payment Summary
+  </h3>
+  
+  <div className="relative">
+    {/* Toggle Button */}
+    <button
+      onClick={handleToggle}
+      className="flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 font-medium text-xs rounded-lg border border-green-200 shadow-sm transition-all duration-200 hover:shadow active:scale-95"
+    >
+      <span>Selected Services</span>
+      <svg
+        className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+
+    {/* Dropdown Content */}
+    {isOpen && (
+      <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-fadeIn">
+        <div className="p-3 border-b border-gray-100">
+          <h4 className="font-semibold text-gray-800">Selected Services List</h4>
+        </div>
+        
+        <div className="max-h-64 overflow-y-auto p-2">
+          {selectedServices.length > 0 ? (
+            <div className="space-y-2">
+              {selectedServices.map((service, index) => (
+                <div
+                  key={service.id}
+                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  <div className="flex items-center min-w-0">
+                    <span className="text-xs font-medium bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3">
+                      {index + 1}
+                    </span>
+                    <span className="font-medium text-gray-800 truncate">
+                      {service.name}
+                    </span>
+                  </div>
+                  <span className="font-semibold text-gray-900 whitespace-nowrap ml-2">
+                    Rs.{service.price}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <p className="text-gray-500 text-sm">No services selected</p>
+            </div>
+          )}
+        </div>
+        
+        {selectedServices.length > 0 && (
+          <div className="p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-700">Total Items: {selectedServices.length}</span>
+              <span className="font-bold text-gray-900">
+                Total: Rs.{totalAmount.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</div>
+
+             
               {/* Amount Calculation */}
               <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 print:space-y-3">
                 <div className="flex justify-between items-center text-sm sm:text-base">
-                  <span className="text-gray-700">Subtotal</span>
+                  <span className="text-gray-700">Services Total</span>
                   <span className="font-medium">Rs.{totalAmount.toFixed(2)}</span>
                 </div>
 
