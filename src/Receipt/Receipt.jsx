@@ -246,7 +246,7 @@ const Receipt = () => {
                     Patient Information <span className="text-red-500">*</span>
                   </h3>
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-600 text-sm">Receipt No:</span>
+                    <span className="text-gray-600 text-sm">Receipt No: <span className="text-red-500">*</span></span>
                     <div>
                       <input
                         className={`w-32 px-2 py-1 border rounded text-gray-900 bg-[#edf9ff] text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none ${errors.receiptNo ? 'border-red-500' : 'border-gray-300'}`}
@@ -260,7 +260,7 @@ const Receipt = () => {
                 </div>
 
                 <div className="flex items-center gap-1 my-1">
-                  <span className="text-gray-600 text-sm">MR No:</span>
+                  <span className="text-gray-600 text-sm">MR No: <span className="text-red-500">*</span></span>
                   <div>
                     <input
                       className={`w-32 px-2 py-1 border rounded text-gray-900 bg-[#edf9ff] text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none ${errors.mrNo ? 'border-red-500' : 'border-gray-300'}`}
@@ -366,7 +366,7 @@ const Receipt = () => {
                   <div className="grid grid-cols-4 gap-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Panel
+                        Panel <span className="text-red-500">*</span>
                       </label>
                       <select
                         name="panel"
@@ -382,7 +382,7 @@ const Receipt = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Reference
+                        Reference <span className="text-red-500">*</span>
                       </label>
                       <select
                         name="reference"
