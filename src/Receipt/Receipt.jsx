@@ -467,7 +467,7 @@ const Receipt = () => {
                       <div
                         key={service.id}
                         className={`p-2.5 sm:p-3 rounded-xl border-2 cursor-pointer transition-all items-center duration-200 
-                        hover:shadow-md active:scale-[0.98] min-h-[100px] sm:min-h-[110px] 
+                        hover:shadow-md active:scale-[0.98] min-h-[70px] sm:min-h-[80px] 
                         flex flex-col justify-between relative group print:min-h-[90px] print:p-2 ${service.selected
                             ? "border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-md"
                             : "border-gray-200 hover:border-blue-300 bg-white"
@@ -505,25 +505,9 @@ const Receipt = () => {
                         <div className="flex-1 ">
                           <div className="mb-1.5">
                             <img className="w-12 h-10" src={service.icon} alt="" />
-                            <h4 className="font-bold text-gray-800 text-xs sm:text-sm print:text-xs leading-tight line-clamp-2">
+                            <h4 className="font-bold text-gray-800 text-xs sm:text-sm print:text-xs  leading-tight line-clamp-2">
                               {service.name}
                             </h4>
-                          </div>
-                          <p className="text-[10px] xs:text-xs text-gray-600 print:text-xs leading-tight line-clamp-2">
-                            {service.description}
-                          </p>
-                        </div>
-
-                        <div className="mt-2 pt-2 border-t border-gray-100">
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-blue-600 text-xs sm:text-sm print:text-xs">
-                              Rs.{service.price}
-                            </span>
-                            {service.selected && (
-                              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                                Selected
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -596,9 +580,9 @@ const Receipt = () => {
           </div>
 
           {/* Right Column - Payment Summary */}
-          <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4">
-            <div className="h-[calc(65vh-100px)] overflow-y-auto bg-white p-4 rounded-xl sm:rounded-2xl">
-              <div className=" mx-auto bg-blue-100 px-3 py-5 rounded">
+          <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4 min-h-screen">
+            <div className="overflow-y-auto bg-white p-4 min-h-48vh rounded-xl sm:rounded-2xl ">
+              <div className=" mx-auto bg-blue-100 min-h-46vh px-3 py-5 rounded">
                 {/* Tabs */}
                 <div className="flex space-x-1 border-b mb-6">
                   {['OPD', 'IPD', 'Tokens', 'History'].map((tab) => (
@@ -613,7 +597,7 @@ const Receipt = () => {
                 </div>
 
                 {/* Content */}
-                <div className="bg-white rounded-lg shadow p-4 h-[calc(46vh-100px)] overflow-y-auto">
+                <div className="bg-white rounded-lg shadow p-4 min-h-[360px] overflow-y-auto">
                   {activeTab === 'OPD' && (
                     <div className="">
                       <h2 className="text-lg font-semibold mb-4">OPD Tab</h2>
@@ -648,7 +632,7 @@ const Receipt = () => {
               </div>
             </div>
             {/* Payment Summary Card */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 sticky top-4 print:static print:shadow-none print:border print:p-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl min-h-[49vh] max-h-[49vh] overflow-y-auto shadow-lg p-4 sm:p-6 sticky top-4 print:static print:shadow-none print:border print:p-4">
 
               <div className="flex space-x-1 border-b mb-6">
                 {['Summary', 'Selected Services'].map((tab) => (
@@ -663,10 +647,10 @@ const Receipt = () => {
               </div>
 
               {/* Content */}
-              <div className="bg-white rounded-lg shadow p-4 h-[calc(42vh-100px)] overflow-y-auto">
+              <div className="bg-white rounded-lg shadow p-4 min-h-42vh">
                 {activeSummary === 'Summary' && (
-                  <div className="flex justify-center mb-4">
-                    
+                  <div className="flex justify-center">
+
                     <div className="space-y-3 sm:space-y-4 print:space-y-3">
                       <div className="flex justify-between items-center text-sm sm:text-base">
                         <span className="text-gray-700">Services Total</span>
@@ -699,7 +683,7 @@ const Receipt = () => {
                       <div className="flex justify-between items-center text-sm sm:text-base">
                         <span className="text-gray-700">Amount Paid</span>
                         <div className="flex items-center">
-                          <span className="mr-2 font-medium">Rs.</span>
+                          <span className="mr-2 font-medium ps-2">Rs.</span>
                           <input
                             type="number"
                             min="0"
@@ -730,7 +714,7 @@ const Receipt = () => {
                       <h4 className="font-semibold text-gray-800">Selected Services List </h4>
                     </div>
 
-                    <div className="max-h-50  p-2">
+                    <div className="max-h-[40vh]  p-2">
                       {selectedServices.length > 0 ? (
                         <div className="space-y-2">
                           {selectedServices.map((service, index) => (
@@ -746,8 +730,9 @@ const Receipt = () => {
                                   {service.name}
                                 </span>
                               </div>
-
-                                  {/* Remove button for selected services */}
+                                  <div className="flex justify-end">
+                                    <span className="text-sm px-2">Rs.{service.price}</span>
+                              {/* Remove button for selected services */}
                               <button onClick={() => handleDeleteService(service.id)}> <svg
                                 className="w-5 h-5 text-red-400"
                                 fill="none"
@@ -762,6 +747,7 @@ const Receipt = () => {
                                 />
                               </svg>
                               </button>
+                                  </div>
                             </div>
                           ))}
                         </div>
@@ -798,7 +784,7 @@ const Receipt = () => {
 
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 py-4 print:hidden">
+              <div className="grid grid-cols-2 gap-2  py-4 print:hidden">
                 <button
                   className="w-full py-2 px-3
                bg-gray-100 text-gray-800 font-medium rounded-lg
