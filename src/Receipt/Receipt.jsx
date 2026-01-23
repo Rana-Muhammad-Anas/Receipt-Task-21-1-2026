@@ -4,8 +4,6 @@ import consulting from "../../public/consulting.png";
 import laboratory from "../../public/laboratory.png";
 import xray from "../../public/xray.png";
 import mri from "../../public/mri.png";
-import eye from "../../public/eye.png";
-import teeth from "../../public/teeth.png";
 
 const Receipt = () => {
   const [activeTab, setActiveTab] = useState('OPD');
@@ -17,6 +15,8 @@ const Receipt = () => {
     return () => clearInterval(timer);
   }, []);
 
+
+  const [activeSummary, setActiveSummary] = useState('Summary')
   const [payment, setPayment] = useState(0);
   const [errors, setErrors] = useState({}); // State for validation errors
   const [receiptNo, setReceiptNo] = useState(""); // State for receipt number
@@ -31,8 +31,6 @@ const Receipt = () => {
     { id: 3, name: "MRI", selected: false, price: 2500, description: "Full Body MRI", icon: mri },
     { id: 4, name: "Consultation", selected: false, price: 500, description: "Doctor Consultation", icon: consulting },
     { id: 5, name: "X-RAY", selected: false, price: 800, description: "Digital X-Ray", icon: xray },
-    { id: 6, name: "Eye Checkup", selected: false, price: 400, description: "Complete Eye Exam", icon: eye },
-    { id: 7, name: "Dental Checkup", selected: false, price: 600, description: "Dental Examination", icon: teeth },
   ];
 
   const [services, setServices] = useState(initialServices);
@@ -53,8 +51,6 @@ const Receipt = () => {
   const discountedAmount = totalAmount - discount;
   const paymentNum = parseInt(payment) || 0;
   const balance = discountedAmount - paymentNum;
-  const isOverpaid = balance < 0;
-  const returnAmount = isOverpaid ? Math.abs(balance) : 0;
 
   // Filter services based on search term
   const filteredServices = searchTerm.trim() === ""
@@ -95,10 +91,18 @@ const Receipt = () => {
       setErrors({ ...errors, [name]: null });
     }
   };
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
 
+  const handleDeleteService = (serviceId) => {
+    // Update selectedServices
+    setSelectedServices(prev => prev.filter(service => service.id !== serviceId));
+
+    // Also update the main services array to unselect it
+    setServices(prevServices =>
+      prevServices.map(service =>
+        service.id === serviceId ? { ...service, selected: false } : service
+      )
+    );
+  };
   const handleReceiptNoChange = (e) => {
     setReceiptNo(e.target.value);
     if (errors.receiptNo) {
@@ -363,7 +367,7 @@ const Receipt = () => {
                       {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 print:text-black">
                         Panel <span className="text-red-500">*</span>
@@ -569,17 +573,6 @@ const Receipt = () => {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 print:hidden">
                 <button
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm shadow-md hover:shadow-lg active:shadow-sm"
-                  onClick={() => {
-                    setServices(services.map((s) => ({ ...s, selected: true })));
-                    if (errors.services) {
-                      setErrors({ ...errors, services: null });
-                    }
-                  }}
-                >
-                  Select All Services
-                </button>
-                <button
                   className="px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 font-medium rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-200 text-sm shadow-md hover:shadow-lg active:shadow-sm border border-gray-300"
                   onClick={() => {
                     setServices(services.map((s) => ({ ...s, selected: false })));
@@ -604,11 +597,11 @@ const Receipt = () => {
 
           {/* Right Column - Payment Summary */}
           <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4">
-            <div className="max-h-[calc(100vh-100px)] overflow-y-auto bg-white p-4 rounded-xl sm:rounded-2xl">
+            <div className="h-[calc(65vh-100px)] overflow-y-auto bg-white p-4 rounded-xl sm:rounded-2xl">
               <div className=" mx-auto bg-blue-100 px-3 py-5 rounded">
                 {/* Tabs */}
                 <div className="flex space-x-1 border-b mb-6">
-                  {['OPD', 'IPD', 'Tokens'].map((tab) => (
+                  {['OPD', 'IPD', 'Tokens', 'History'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -644,193 +637,168 @@ const Receipt = () => {
                       {/* Add your Tokens data table or content here */}
                     </div>
                   )}
+                  {activeTab === 'History' && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-4">History Tab</h2>
+                      <p className="text-gray-600">History data goes here</p>
+                      {/* Add your Tokens data table or content here */}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
             {/* Payment Summary Card */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 sticky top-4 print:static print:shadow-none print:border print:p-4">
-              {/* <div className="flex justify-between">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 sm:mb-6 print:text-black print:mb-3">
-                  Payment Summary
-                </h3>
-                <button className="text-green-800" onClick={handleToggle}> Selected Services </button>
-                {isOpen ? <div>
-                  <div className="mb-4 sm:mb-6 print:mb-3">
-                    <div className="max-h-40 sm:max-h-50 overflow-y-auto">
+
+              <div className="flex space-x-1 border-b mb-6">
+                {['Summary', 'Selected Services'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveSummary(tab)}
+                    className={`px-4 py-2 font-medium ${activeSummary === tab ? 'border-b-2  border-blue-500 text-blue-800' : 'text-gray-500'}`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {/* Content */}
+              <div className="bg-white rounded-lg shadow p-4 h-[calc(42vh-100px)] overflow-y-auto">
+                {activeSummary === 'Summary' && (
+                  <div className="flex justify-center mb-4">
+                    
+                    <div className="space-y-3 sm:space-y-4 print:space-y-3">
+                      <div className="flex justify-between items-center text-sm sm:text-base">
+                        <span className="text-gray-700">Services Total</span>
+                        <span className="font-medium">Rs.{totalAmount.toFixed(2)}</span>
+                      </div>
+
+                      <div className="flex justify-between items-center text-sm sm:text-base">
+                        <span className="text-gray-700">Discount</span>
+                        <div className="flex items-center">
+                          <span className="mr-2 font-medium">Rs.</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max={totalAmount}
+                            value={discount}
+                            onChange={handleDiscountChange}
+                            className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="border-t border-gray-300 pt-3 sm:pt-4">
+                        <div className="flex justify-between font-bold text-sm sm:text-base">
+                          <span>Total Payable</span>
+                          <span className="text-blue-700">Rs.{discountedAmount.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      {/* Amount Paid */}
+                      <div className="flex justify-between items-center text-sm sm:text-base">
+                        <span className="text-gray-700">Amount Paid</span>
+                        <div className="flex items-center">
+                          <span className="mr-2 font-medium">Rs.</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={payment}
+                            onChange={handlePaymentChange}
+                            className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-green-600 font-bold text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Balance */}
+                      <div className="flex justify-between items-center text-sm sm:text-base">
+                        <span className="text-gray-700">Balance</span>
+                        <span className={`font-bold ${balance < 0 ? 'text-red-600' : balance > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
+                          Rs.{Math.abs(balance).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+
+
+                {activeSummary === 'Selected Services' && (
+
+                  <>
+                    <div className="p-3 border-b border-gray-100">
+                      <h4 className="font-semibold text-gray-800">Selected Services List </h4>
+                    </div>
+
+                    <div className="max-h-50  p-2">
                       {selectedServices.length > 0 ? (
-                        <div className="space-y-1 sm:space-y-2">
+                        <div className="space-y-2">
                           {selectedServices.map((service, index) => (
                             <div
                               key={service.id}
-                              className="flex justify-between items-center py-2 border-b border-gray-100 text-sm sm:text-base print:text-sm"
+                              className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors"
                             >
-                              <div className="truncate max-w-[60%]">
-                                <span className="ml-2 text-xs text-gray-500 px-2">
-                                  #{index + 1}
+                              <div className="flex items-center min-w-0">
+                                <span className="text-xs font-medium bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3">
+                                  {index + 1}
                                 </span>
-                                <span className="font-medium text-gray-800">
+                                <span className="font-medium text-gray-800 truncate">
                                   {service.name}
                                 </span>
                               </div>
-                              <span className="font-medium whitespace-nowrap">Rs.{service.price}</span>
+
+                                  {/* Remove button for selected services */}
+                              <button onClick={() => handleDeleteService(service.id)}> <svg
+                                className="w-5 h-5 text-red-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                              </button>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-4 text-gray-500 text-sm sm:text-base">
-                          No services selected
+                        <div className="text-center py-8">
+                          <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
+                          <p className="text-gray-500 text-sm">No services selected</p>
                         </div>
                       )}
                     </div>
-                  </div>
-                </div> : ""}
-             </div> */}
+                    {/* Amount Calculation */}
+                    {selectedServices.length > 0 && (
+                      <div className="p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-700">Total Items: {selectedServices.length}</span>
+                          <span className="font-bold text-gray-900">
+                            Total: Rs.{totalAmount.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
 
-
-
-
-
-<div className="flex justify-between items-start mb-4">
-  <h3 className="text-xl font-bold text-gray-800 sm:mb-6 print:text-black print:mb-3">
-    Payment Summary
-  </h3>
-  
-  <div className="relative">
-    {/* Toggle Button */}
-    <button
-      onClick={handleToggle}
-      className="flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 font-medium text-xs rounded-lg border border-green-200 shadow-sm transition-all duration-200 hover:shadow active:scale-95"
-    >
-      <span>Selected Services</span>
-      <svg
-        className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-
-    {/* Dropdown Content */}
-    {isOpen && (
-      <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-fadeIn">
-        <div className="p-3 border-b border-gray-100">
-          <h4 className="font-semibold text-gray-800">Selected Services List</h4>
-        </div>
-        
-        <div className="max-h-64 overflow-y-auto p-2">
-          {selectedServices.length > 0 ? (
-            <div className="space-y-2">
-              {selectedServices.map((service, index) => (
-                <div
-                  key={service.id}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  <div className="flex items-center min-w-0">
-                    <span className="text-xs font-medium bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3">
-                      {index + 1}
-                    </span>
-                    <span className="font-medium text-gray-800 truncate">
-                      {service.name}
-                    </span>
-                  </div>
-                  <span className="font-semibold text-gray-900 whitespace-nowrap ml-2">
-                    Rs.{service.price}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              <p className="text-gray-500 text-sm">No services selected</p>
-            </div>
-          )}
-        </div>
-        
-        {selectedServices.length > 0 && (
-          <div className="p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-700">Total Items: {selectedServices.length}</span>
-              <span className="font-bold text-gray-900">
-                Total: Rs.{totalAmount.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-</div>
-
-             
-              {/* Amount Calculation */}
-              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 print:space-y-3">
-                <div className="flex justify-between items-center text-sm sm:text-base">
-                  <span className="text-gray-700">Services Total</span>
-                  <span className="font-medium">Rs.{totalAmount.toFixed(2)}</span>
-                </div>
-
-                <div className="flex justify-between items-center text-sm sm:text-base">
-                  <span className="text-gray-700">Discount</span>
-                  <div className="flex items-center">
-                    <span className="mr-2 font-medium">Rs.</span>
-                    <input
-                      type="number"
-                      min="0"
-                      max={totalAmount}
-                      value={discount}
-                      onChange={handleDiscountChange}
-                      className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
-                    />
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-300 pt-3 sm:pt-4">
-                  <div className="flex justify-between font-bold text-sm sm:text-base">
-                    <span>Total Payable</span>
-                    <span className="text-blue-700">Rs.{discountedAmount.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Amount Paid */}
-                <div className="flex justify-between items-center text-sm sm:text-base">
-                  <span className="text-gray-700">Amount Paid</span>
-                  <div className="flex items-center">
-                    <span className="mr-2 font-medium">Rs.</span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={payment}
-                      onChange={handlePaymentChange}
-                      className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-green-600 font-bold text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
-                    />
-                  </div>
-                </div>
-
-                {/* Balance */}
-                <div className="flex justify-between items-center text-sm sm:text-base">
-                  <span className="text-gray-700">Balance</span>
-                  <span className={`font-bold ${balance < 0 ? 'text-red-600' : balance > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
-                    Rs.{Math.abs(balance).toFixed(2)}
-                  </span>
-                </div>
-
-                {/* Return Payment (only shown when overpaid) */}
-                {isOverpaid && (
-                  <div className="flex justify-between items-center pt-3 sm:pt-4 border-t border-gray-300 text-sm sm:text-base">
-                    <span className="text-gray-700">Return Payment</span>
-                    <span className="font-bold text-red-600">Rs.{returnAmount.toFixed(2)}</span>
-                  </div>
+                  </>
                 )}
               </div>
 
+
+
+
+
+
+
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 print:hidden">
+              <div className="grid grid-cols-2 gap-2 py-4 print:hidden">
                 <button
                   className="w-full py-2 px-3
                bg-gray-100 text-gray-800 font-medium rounded-lg
@@ -876,51 +844,9 @@ const Receipt = () => {
                 }
                 return null;
               })()}
-              {/* Receipt Status */}
-              <div className={`mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg border ${paymentNum === 0 ? 'bg-gray-50 border-gray-200' :
-                isOverpaid ? 'bg-yellow-50 border-yellow-200' :
-                  balance === 0 ? 'bg-green-50 border-green-200' :
-                    'bg-orange-50 border-orange-200'
-                } print:p-3`}>
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-2 sm:mr-3 ${paymentNum === 0 ? 'bg-gray-400' :
-                    isOverpaid ? 'bg-yellow-500' :
-                      balance === 0 ? 'bg-green-500' :
-                        'bg-orange-500'
-                    }`}></div>
-                  <div>
-                    <div className={`font-medium text-sm sm:text-base print:text-sm ${paymentNum === 0 ? 'text-gray-800' :
-                      isOverpaid ? 'text-yellow-800' :
-                        balance === 0 ? 'text-green-800' :
-                          'text-orange-800'
-                      }`}>
-                      {paymentNum === 0 ? 'No Payment Made' :
-                        isOverpaid ? `Overpaid - Return Rs.${returnAmount.toFixed(2)}` :
-                          balance === 0 ? 'Fully Paid' :
-                            `Partially Paid - Due: Rs.${balance.toFixed(2)}`}
-                    </div>
-                    <div className={`text-xs print:text-xs ${paymentNum === 0 ? 'text-gray-700' :
-                      isOverpaid ? 'text-yellow-700' :
-                        balance === 0 ? 'text-green-700' :
-                          'text-orange-700'
-                      }`}>
-                      {paymentNum === 0 ? 'Please enter payment amount' :
-                        isOverpaid ? 'Patient needs to receive return payment' :
-                          balance === 0 ? 'All services have been processed' :
-                            `Remaining balance to be paid: Rs.${balance.toFixed(2)}`}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-6 sm:mt-8 text-center text-gray-600 text-xs sm:text-sm print:mt-4 print:text-xs print:text-black">
-          <p>OPD Receipt System v2.0 • This is a computer-generated receipt</p>
-          <p className="mt-1">For any queries, contact the hospital administration desk</p>
-        </footer>
       </div>
     </div>
   );
