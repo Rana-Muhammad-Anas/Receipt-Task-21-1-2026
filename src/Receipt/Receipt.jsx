@@ -22,7 +22,6 @@ const Receipt = () => {
   const [receiptNo, setReceiptNo] = useState(""); // State for receipt number
   const [mrNo, setMrNo] = useState(""); // State for MR number
   const [searchTerm, setSearchTerm] = useState(""); // State for search term
-  const [isOpen, setIsOpen] = useState(false);     // Toggle Effect for Selected Services
 
   // Initial services data
   const initialServices = [
