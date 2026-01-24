@@ -401,9 +401,9 @@ function DoctorRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-3 sm:p-4 md:p-6 lg:p-8 print:bg-white print:p-0">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-2 sm:p-4 md:p-6 lg:p-8 print:bg-white print:p-0">
       <div className="mx-auto max-w-7xl">
-        <div className="overflow-x-auto rounded-lg p-3 sm:p-5 lg:p-8">
+        <div className="overflow-x-auto rounded-lg p-2 sm:p-5 lg:p-8">
           <div className="border bg-white rounded-lg py-5 px-4 sm:px-6 lg:px-8 mb-6 shadow-sm">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center print:mb-4">
               DOCTOR REGISTRATION
