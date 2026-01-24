@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import DateTime from "../Components/DateTime";
 
 const OPD_Services = () => {
-    
-    const [activeSummary, setActiveSummary] = useState('Summary');
     const [payment, setPayment] = useState(0);
     const [errors, setErrors] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +42,11 @@ const OPD_Services = () => {
     const [opdInfo, setOpdInfo] = useState({
         name: "",
         amount: "",
+        isFirstVisit: false,
+        amountEditable: false,
+        requireConsultant: false,
+        allowOpdService: true,
+        isLarge: false
     });
 
     const totalAmount = selectedServices.reduce((sum, service) => sum + service.amount, 0);
@@ -74,12 +77,36 @@ const OPD_Services = () => {
         }
     };
 
+    const handleCheckBoxes = (e) => {
+        const { name, checked } = e.target;
+        setOpdInfo(prev => ({ ...prev, [name]: checked }));
+    };
+
     const handleInputChange = (e) => {
         let { name, value } = e.target;
         setOpdInfo({ ...opdInfo, [name]: value });
         if (errors[name]) {
             setErrors({ ...errors, [name]: null });
         }
+    };
+
+    const handleServiceAmountChange = (serviceId, newAmount) => {
+        const amountValue = parseInt(newAmount) || 0;
+        if (amountValue >= 0) {
+            setServices(prevServices =>
+                prevServices.map(service =>
+                    service.id === serviceId ? { ...service, amount: amountValue } : service
+                )
+            );
+        }
+    };
+
+    const handleServiceAllowedChange = (serviceId, newAllowed) => {
+        setServices(prevServices =>
+            prevServices.map(service =>
+                service.id === serviceId ? { ...service, allowed: newAllowed } : service
+            )
+        );
     };
 
     const handleDeleteService = (serviceId) => {
@@ -90,7 +117,8 @@ const OPD_Services = () => {
             )
         );
     };
- const handleDiscountChange = (e) => {
+
+    const handleDiscountChange = (e) => {
         let value = e.target.value;
         value = value.replace(/^0+(?=\d)/, "");
         if (value === "" || parseInt(value) < 0) value = "0";
@@ -142,7 +170,7 @@ const OPD_Services = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-3 sm:p-4 md:p-6 lg:p-8 print:bg-white print:p-0">
-            <div className="max-w-7xl mx-auto">
+            <div className="mx-auto max-w-7xl">
                 {/* Header */}
                 <header className="mb-6 md:mb-8 print:mb-4">
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 print:text-black">
@@ -150,9 +178,9 @@ const OPD_Services = () => {
                     </h1>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 print:grid-cols-1 print:gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:gap-5 md:gap-6 print:grid-cols-1 print:gap-4">
                     {/* Left Column - Patient Info & Services */}
-                    <div className="lg:col-span-2 space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4">
+                    <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4">
                         {/* Receipt Header Card */}
                         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border-l-4 sm:border-l-8 border-blue-600 print:border-l-4 print:p-4 print:shadow-none print:border">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 print:mb-3">
@@ -195,6 +223,84 @@ const OPD_Services = () => {
                                             type="number"
                                         />
                                         {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                                    {/* Amount Editable Checkbox */}
+                                    <div className="flex items-center">
+                                        <label className="flex items-center space-x-2 cursor-pointer">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    name="amountEditable"
+                                                    checked={opdInfo.amountEditable}
+                                                    onChange={handleCheckBoxes}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${opdInfo.amountEditable ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${opdInfo.amountEditable ? 'translate-x-5' : ''}`}></div>
+                                                </div>
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-700">Amount Editable</span>
+                                        </label>
+                                    </div>
+
+                                    {/* Require Consultant Checkbox */}
+                                    <div className="flex items-center">
+                                        <label className="flex items-center space-x-2 cursor-pointer">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    name="requireConsultant"
+                                                    checked={opdInfo.requireConsultant}
+                                                    onChange={handleCheckBoxes}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${opdInfo.requireConsultant ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${opdInfo.requireConsultant ? 'translate-x-5' : ''}`}></div>
+                                                </div>
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-700">Require Consultant</span>
+                                        </label>
+                                    </div>
+
+                                    {/* Allow OPD Service Checkbox */}
+                                    <div className="flex items-center">
+                                        <label className="flex items-center space-x-2 cursor-pointer">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    name="allowOpdService"
+                                                    checked={opdInfo.allowOpdService}
+                                                    onChange={handleCheckBoxes}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${opdInfo.allowOpdService ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${opdInfo.allowOpdService ? 'translate-x-5' : ''}`}></div>
+                                                </div>
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-700">Allow OPD Service</span>
+                                        </label>
+                                    </div>
+
+                                    {/* Large OPD Receipt Checkbox */}
+                                    <div className="flex items-center">
+                                        <label className="flex items-center space-x-2 cursor-pointer">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    name="isLarge"
+                                                    checked={opdInfo.isLarge}
+                                                    onChange={handleCheckBoxes}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${opdInfo.isLarge ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                                    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${opdInfo.isLarge ? 'translate-x-5' : ''}`}></div>
+                                                </div>
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-700">Large OPD Receipt</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -308,9 +414,20 @@ const OPD_Services = () => {
                                                         </div>
                                                     </td>
                                                     <td className="px-3 py-3 whitespace-nowrap">
-                                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-                                                            Rs.{service.amount}
-                                                        </span>
+                                                        {opdInfo.amountEditable ? (
+                                                            <input
+                                                                type="number"
+                                                                value={service.amount}
+                                                                onChange={(e) => handleServiceAmountChange(service.id, e.target.value)}
+                                                                className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                min="0"
+                                                            />
+                                                        ) : (
+                                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                                                Rs.{service.amount}
+                                                            </span>
+                                                        )}
                                                     </td>
                                                     <td className="px-3 py-3 whitespace-nowrap">
                                                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${service.consultant === 'Yes' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
@@ -327,18 +444,37 @@ const OPD_Services = () => {
                                                         </span>
                                                     </td>
                                                     <td className="px-3 py-3 whitespace-nowrap">
-                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${service.allowed === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                            {service.allowed === 'Yes' ? (
-                                                                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                                                </svg>
-                                                            ) : (
-                                                                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                                                </svg>
-                                                            )}
-                                                            {service.allowed}
-                                                        </span>
+                                                        {opdInfo.allowOpdService ? (
+                                                            <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleServiceAllowedChange(service.id, "Yes")}
+                                                                    className={`px-3 py-1 rounded-full text-sm font-medium ${service.allowed === "Yes" ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}
+                                                                >
+                                                                    Yes
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleServiceAllowedChange(service.id, "No")}
+                                                                    className={`px-3 py-1 rounded-full text-sm font-medium ${service.allowed === "No" ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}
+                                                                >
+                                                                    No
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${service.allowed === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                                {service.allowed === 'Yes' ? (
+                                                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                                    </svg>
+                                                                ) : (
+                                                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                                                    </svg>
+                                                                )}
+                                                                {service.allowed}
+                                                            </span>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             );
@@ -373,187 +509,7 @@ const OPD_Services = () => {
                         </div>
                     </div>
 
-                    {/* Right Column - Payment Summary */}
-                    <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4 min-h-screen">
-                        {/* Payment Summary Card */}
-                        <div className="bg-white rounded-xl sm:rounded-2xl min-h-[49vh] max-h-[49vh] overflow-y-auto shadow-lg p-4 sm:p-6 sticky top-4 print:static print:shadow-none print:border print:p-4">
-                            <div className="flex space-x-1 border-b mb-6">
-                                {['Summary', 'Selected Services'].map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveSummary(tab)}
-                                        className={`px-4 py-2 font-medium ${activeSummary === tab ? 'border-b-2 border-blue-500 text-blue-800' : 'text-gray-500'}`}
-                                    >
-                                        {tab}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Content */}
-                            <div className="bg-white rounded-lg shadow p-4 min-h-42vh">
-                                {activeSummary === 'Summary' && (
-                                    <div className="flex justify-center">
-                                        <div className="space-y-3 sm:space-y-4 print:space-y-3">
-                                            <div className="flex justify-between items-center text-sm sm:text-base">
-                                                <span className="text-gray-700">Services Total</span>
-                                                <span className="font-medium">Rs.{totalAmount.toFixed(2)}</span>
-                                            </div>
-
-                                            <div className="flex justify-between items-center text-sm sm:text-base">
-                                                <span className="text-gray-700">Discount</span>
-                                                <div className="flex items-center">
-                                                    <span className="mr-2 font-medium">Rs.</span>
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        max={totalAmount}
-                                                        value={discount}
-                                                        onChange={handleDiscountChange}
-                                                        className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="border-t border-gray-300 pt-3 sm:pt-4">
-                                                <div className="flex justify-between font-bold text-sm sm:text-base">
-                                                    <span>Total Payable</span>
-                                                    <span className="text-blue-700">Rs.{discountedAmount.toFixed(2)}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Amount Paid */}
-                                            <div className="flex justify-between items-center text-sm sm:text-base">
-                                                <span className="text-gray-700">Amount Paid</span>
-                                                <div className="flex items-center">
-                                                    <span className="mr-2 font-medium ps-2">Rs.</span>
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        value={payment}
-                                                        onChange={handlePaymentChange}
-                                                        className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-green-600 font-bold text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            {/* Balance */}
-                                            <div className="flex justify-between items-center text-sm sm:text-base">
-                                                <span className="text-gray-700">Balance</span>
-                                                <span className={`font-bold ${balance < 0 ? 'text-red-600' : balance > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
-                                                    Rs.{Math.abs(balance).toFixed(2)}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeSummary === 'Selected Services' && (
-                                    <>
-                                        <div className="p-3 border-b border-gray-100">
-                                            <h4 className="font-semibold text-gray-800">Selected Services List</h4>
-                                        </div>
-
-                                        <div className="max-h-[40vh] p-2">
-                                            {selectedServices.length > 0 ? (
-                                                <div className="space-y-2">
-                                                    {selectedServices.map((service, index) => (
-                                                        <div
-                                                            key={service.id}
-                                                            className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors"
-                                                        >
-                                                            <div className="flex items-center min-w-0">
-                                                                <span className="text-xs font-medium bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mr-3">
-                                                                    {index + 1}
-                                                                </span>
-                                                                <span className="font-medium text-gray-800 truncate">
-                                                                    {service.service}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex justify-end items-center">
-                                                                <span className="text-sm px-2">Rs.{service.amount}</span>
-                                                                {/* Remove button for selected services */}
-                                                                <button onClick={() => handleDeleteService(service.id)}>
-                                                                    <svg
-                                                                        className="w-5 h-5 text-red-400"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        viewBox="0 0 24 24"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth="2"
-                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                                        />
-                                                                    </svg>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-8">
-                                                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                                    </svg>
-                                                    <p className="text-gray-500 text-sm">No services selected</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {/* Amount Calculation */}
-                                        {selectedServices.length > 0 && (
-                                            <div className="p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-                                                <div className="flex justify-between items-center text-sm">
-                                                    <span className="text-gray-700">Total Items: {selectedServices.length}</span>
-                                                    <span className="font-bold text-gray-900">
-                                                        Total: Rs.{totalAmount.toFixed(2)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="grid grid-cols-2 gap-2 py-4 print:hidden">
-                                <button
-                                    className="w-full py-2 px-3 bg-gray-100 text-gray-800 font-medium rounded-lg hover:bg-gray-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={handleSaveExit}
-                                >
-                                    Save & Exit
-                                </button>
-
-                                <button
-                                    className="w-full py-2 px-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={handlePrint}
-                                >
-                                    Print Receipt
-                                </button>
-                            </div>
-
-                            {/* Validation Summary */}
-                            {(() => {
-                                const hasErrors = Object.values(errors).some(error => error && error.trim());
-                                if (hasErrors) {
-                                    return (
-                                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                            <p className="text-red-600 text-sm font-medium mb-1">Please fix the following errors:</p>
-                                            <ul className="text-red-500 text-xs list-disc pl-4">
-                                                {Object.entries(errors)
-                                                    .filter(([_, error]) => error && error.trim())
-                                                    .map(([key, error]) => (
-                                                        <li key={key}>{error}</li>
-                                                    ))
-                                                }
-                                            </ul>
-                                        </div>
-                                    );
-                                }
-                                return null;
-                            })()}
-                        </div>
-                    </div>
+                    {/* Right Column - Summary */}
                 </div>
             </div>
         </div>
