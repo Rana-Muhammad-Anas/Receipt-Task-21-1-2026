@@ -228,19 +228,19 @@ const ActionButtons = ({ onReset, onSave, onPrint }) => (
   <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mb-8">
     <button
       onClick={onReset}
-      className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
+      className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
     >
       New
     </button>
     <button
       onClick={onSave}
-      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+      className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
     >
       Save Doctor
     </button>
     <button
       onClick={onPrint}
-      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+      className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
     >
       Print
     </button>
