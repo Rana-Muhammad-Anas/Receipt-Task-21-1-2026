@@ -119,7 +119,7 @@ function Consultant_Timing() {
             "days": "Monday, Saturday",
             "timings": "08:00 AM - 02:00 PM",
             "hospital": "WMCTH",
-            "contact": "0300-0115667 / 0332-",
+            "contact": "0300-0115667",
             "fee": "1500"
         },
         {
@@ -277,7 +277,7 @@ function Consultant_Timing() {
                 <div className="overflow-x-auto rounded-lg p-10">
                     <div className="border bg-white rounded py-5 px-5 mb-6">
                         <div className="flex space justify-between ">
-                            <h1 className="text-2xl font-bold text-gray-800 mb-3 print:mb-2">
+                            <h1 className="text-3xl font-bold text-gray-800 mb-3 print:mb-2">
                                 Consultant Information
                             </h1>
                         </div>
@@ -293,7 +293,7 @@ function Consultant_Timing() {
                                     <div className="relative">
                                         <div 
                                             onClick={handleDropdownToggle}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 cursor-pointer flex justify-between items-center"
+                                            className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 cursor-pointer flex justify-between items-center"
                                         >
                                             <span className={consultantInfo.consultant ? "text-gray-900" : "text-gray-400"}>
                                                 {consultantInfo.consultant || "Select Consultant"}
@@ -319,7 +319,7 @@ function Consultant_Timing() {
                                                         value={searchQuery}
                                                         onChange={handleInputChange}
                                                         placeholder="Search consultant or speciality..."
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                         autoFocus
                                                     />
                                                 </div>
@@ -355,7 +355,7 @@ function Consultant_Timing() {
                                         Speciality <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
+                                        className="w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
                                         name="speciality"
                                         value={consultantInfo.speciality}
                                         onChange={handleInputChange}
@@ -368,7 +368,7 @@ function Consultant_Timing() {
                                         Days <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
+                                        className="w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
                                         name="days"
                                         value={consultantInfo.days}
                                         onChange={handleInputChange}
@@ -384,7 +384,7 @@ function Consultant_Timing() {
                                         From Hospital <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
+                                        className="w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
                                         name="hospital"
                                         value={consultantInfo.hospital}
                                         onChange={handleInputChange}
@@ -397,7 +397,7 @@ function Consultant_Timing() {
                                         Timings
                                     </label>
                                     <input
-                                        className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
+                                        className="w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
                                         name="timings"
                                         value={consultantInfo.timings}
                                         onChange={handleInputChange}
@@ -413,7 +413,7 @@ function Consultant_Timing() {
                                         Contact No. <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        className="w-full py-2 px-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
+                                        className="w-full py-1 px-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
                                         name="phone"
                                         value={consultantInfo.phone}
                                         onChange={handleInputChange}
@@ -427,7 +427,7 @@ function Consultant_Timing() {
                                         Fee
                                     </label>
                                     <input
-                                        className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
+                                        className="w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 border-gray-300"
                                         name="fee"
                                         value={consultantInfo.fee}
                                         onChange={handleInputChange}

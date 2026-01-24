@@ -4,16 +4,10 @@ import consulting from "../../public/consulting.png";
 import laboratory from "../../public/laboratory.png";
 import xray from "../../public/xray.png";
 import mri from "../../public/mri.png";
+import DateTime from "../Components/DateTime";
 
 const Receipt = () => {
   const [activeTab, setActiveTab] = useState('OPD');
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
 
   const [activeSummary, setActiveSummary] = useState('Summary')
@@ -116,10 +110,6 @@ const Receipt = () => {
     }
   };
 
-  const handleSelectChange = (e) => {
-    setPatientInfo({ ...patientInfo, [e.target.name]: e.target.value });
-  };
-
   const handleDiscountChange = (e) => {
     let value = e.target.value;
     value = value.replace(/^0+(?=\d)/, "");
@@ -220,24 +210,7 @@ const Receipt = () => {
                       OPD RECEIPT - COUNTER 01
                     </h2>
                     {/* Date & Time */}
-                    <div className="bg-blue-100 text-blue-800 px-3 sm:px-4 py-2 rounded-lg w-full sm:w-auto print:bg-gray-100 print:text-black">
-                      <div className="font-bold text-sm sm:text-base">
-                        {now.toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </div>
-                      <div className="text-xs sm:text-sm">
-                        {now.toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                          hour12: true,
-                        })}
-                      </div>
-                    </div>
+                    <DateTime />
                   </div>
                 </div>
               </div>
@@ -281,7 +254,7 @@ const Receipt = () => {
                         Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                         name="name"
                         value={patientInfo.name}
                         onChange={handleInputChange}
@@ -294,7 +267,7 @@ const Receipt = () => {
                         Phone <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className={`w-full py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full p-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                         name="phone"
                         value={patientInfo.phone}
                         onChange={handleInputChange}
@@ -311,7 +284,7 @@ const Receipt = () => {
                         Age <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
                         name="age"
                         value={patientInfo.age}
                         onChange={handleInputChange}
@@ -327,7 +300,7 @@ const Receipt = () => {
                         Gender <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
                         name="gender"
                         value={patientInfo.gender}
                         onChange={handleInputChange}
@@ -342,7 +315,7 @@ const Receipt = () => {
                         Address <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                         name="address"
                         value={patientInfo.address}
                         onChange={handleInputChange}
@@ -356,7 +329,7 @@ const Receipt = () => {
                         City
                       </label>
                       <input
-                        className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                         name="city"
                         value={patientInfo.city}
                         onChange={handleInputChange}
@@ -374,8 +347,8 @@ const Receipt = () => {
                       <select
                         name="panel"
                         value={patientInfo.panel}
-                        onChange={handleSelectChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
                       >
                         <option value="General Physician">General Physician</option>
                         <option value="Dentist">Dentist</option>
@@ -390,8 +363,8 @@ const Receipt = () => {
                       <select
                         name="reference"
                         value={patientInfo.reference}
-                        onChange={handleSelectChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
                       >
                         <option value="General Physician">General Physician</option>
                         <option value="Dentist">Dentist</option>
@@ -428,7 +401,7 @@ const Receipt = () => {
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder="Search services by name or description..."
-                    className="w-full px-4 py-2.5 pl-10 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white"
+                    className="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white"
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -516,7 +489,7 @@ const Receipt = () => {
                 <div className="col-span-3 max-h-[200px] sm:max-h-[220px] md:max-h-[240px] overflow-y-auto pr-2 mb-4 border-2 border-black rounded-lg">
                   <div className="col-span-2">
                     <div className="mb-4 sm:mb-6 print:mb-3">
-                      <h4 className="font-medium text-gray-700 mb-2 sm:mb-3 print:text-black text-center">
+                      <h4 className="font-medium text-gray-700 mb-2 sm:mb-3 pt-3 print:text-black text-center">
                         Selected Services
                       </h4>
                       <div className="max-h-48 sm:max-h-64">
@@ -580,8 +553,8 @@ const Receipt = () => {
 
           {/* Right Column - Payment Summary */}
           <div className="space-y-4 sm:space-y-5 md:space-y-6 print:space-y-4 min-h-screen">
-            <div className="overflow-y-auto bg-white p-4 min-h-48vh rounded-xl sm:rounded-2xl ">
-              <div className=" mx-auto bg-blue-100 min-h-46vh px-3 py-5 rounded">
+            <div className="overflow-y-auto bg-white p-4 min-h-[45vh] rounded-xl sm:rounded-2xl ">
+              <div className=" mx-auto bg-blue-100 min-h-[44vh] px-3 py-5 rounded">
                 {/* Tabs */}
                 <div className="flex space-x-1 border-b mb-6">
                   {['OPD', 'IPD', 'Tokens', 'History'].map((tab) => (
@@ -596,7 +569,7 @@ const Receipt = () => {
                 </div>
 
                 {/* Content */}
-                <div className="bg-white rounded-lg shadow p-4 min-h-[360px] overflow-y-auto">
+                <div className="bg-white rounded-lg shadow p-4 min-h-[327px] overflow-y-auto">
                   {activeTab === 'OPD' && (
                     <div className="">
                       <h2 className="text-lg font-semibold mb-4">OPD Tab</h2>
@@ -729,24 +702,24 @@ const Receipt = () => {
                                   {service.name}
                                 </span>
                               </div>
-                                  <div className="flex justify-end">
-                                    <span className="text-sm px-2">Rs.{service.price}</span>
-                              {/* Remove button for selected services */}
-                              <button onClick={() => handleDeleteService(service.id)}> <svg
-                                className="w-5 h-5 text-red-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                              </button>
-                                  </div>
+                              <div className="flex justify-end">
+                                <span className="text-sm px-2">Rs.{service.price}</span>
+                                {/* Remove button for selected services */}
+                                <button onClick={() => handleDeleteService(service.id)}> <svg
+                                  className="w-5 h-5 text-red-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                                </svg>
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </div>

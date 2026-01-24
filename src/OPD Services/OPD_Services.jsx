@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from "react";
+import DateTime from "../Components/DateTime";
 
 const OPD_Services = () => {
-    const [now, setNow] = useState(new Date());
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setNow(new Date());
-        }, 1000);
-        return () => clearInterval(timer);
-    }, []);
-
+    
     const [activeSummary, setActiveSummary] = useState('Summary');
     const [payment, setPayment] = useState(0);
     const [errors, setErrors] = useState({});
@@ -96,12 +90,7 @@ const OPD_Services = () => {
             )
         );
     };
-
-    const handleSelectChange = (e) => {
-        setOpdInfo({ ...opdInfo, [e.target.name]: e.target.value });
-    };
-
-    const handleDiscountChange = (e) => {
+ const handleDiscountChange = (e) => {
         let value = e.target.value;
         value = value.replace(/^0+(?=\d)/, "");
         if (value === "" || parseInt(value) < 0) value = "0";
@@ -173,24 +162,7 @@ const OPD_Services = () => {
                                             OPD Services
                                         </h2>
                                         {/* Date & Time */}
-                                        <div className="bg-blue-100 text-blue-800 px-3 sm:px-4 py-2 rounded-lg w-full sm:w-auto print:bg-gray-100 print:text-black">
-                                            <div className="font-bold text-sm sm:text-base">
-                                                {now.toLocaleDateString("en-US", {
-                                                    weekday: "long",
-                                                    year: "numeric",
-                                                    month: "long",
-                                                    day: "numeric",
-                                                })}
-                                            </div>
-                                            <div className="text-xs sm:text-sm">
-                                                {now.toLocaleTimeString("en-US", {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                    second: "2-digit",
-                                                    hour12: true,
-                                                })}
-                                            </div>
-                                        </div>
+                                        <DateTime />
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +174,7 @@ const OPD_Services = () => {
                                             OPD Service <span className="text-red-500">*</span>
                                         </label>
                                         <input
-                                            className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                                            className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                             name="name"
                                             value={opdInfo.name}
                                             onChange={handleInputChange}
@@ -215,7 +187,7 @@ const OPD_Services = () => {
                                             Amount <span className="text-red-500">*</span>
                                         </label>
                                         <input
-                                            className={`w-full py-2 px-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.amount ? 'border-red-500' : 'border-gray-300'}`}
+                                            className={`w-full py-1 px-2 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.amount ? 'border-red-500' : 'border-gray-300'}`}
                                             name="amount"
                                             value={opdInfo.amount}
                                             onChange={handleInputChange}
@@ -229,7 +201,7 @@ const OPD_Services = () => {
                         </div>
 
                         {/* OPD Services Table */}
-                        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 print:shadow-none print:border print:p-4">
+                        <div className="bg-white overflow-y-auto max-h-[60vh] rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 print:shadow-none print:border print:p-4">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 print:mb-3">
                                 <h3 className="text-xl font-bold text-gray-800 print:text-black">
                                     OPD Services <span className="text-red-500">*</span>
@@ -252,7 +224,7 @@ const OPD_Services = () => {
                                         value={searchTerm}
                                         onChange={handleSearchChange}
                                         placeholder="Search services by name..."
-                                        className="w-full px-4 py-2.5 pl-10 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white"
+                                        className="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white"
                                     />
                                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
