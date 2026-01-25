@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState,useEffect } from 'react';
 
-function DateTime() {
+export default function DateTime() {
     const [now, setNow] = useState(new Date());
     useEffect(() => {
         const timer = setInterval(() => {
@@ -31,4 +31,4 @@ function DateTime() {
     )
 }
 
-export default DateTime
+export default
