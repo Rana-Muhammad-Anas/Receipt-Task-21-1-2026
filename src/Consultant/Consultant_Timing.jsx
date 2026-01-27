@@ -173,7 +173,7 @@ function Consultant_Timing() {
         phone: "",
         fee: "",
     });
-    
+
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredConsultants, setFilteredConsultants] = useState(consultantData);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -208,12 +208,12 @@ function Consultant_Timing() {
 
     const handleInputChange = (e) => {
         let { name, value } = e.target;
-        
+
         if (name === "searchQuery") {
             setSearchQuery(value);
             return;
         }
-        
+
         if (name === "consultant" && value) {
             const selectedConsultant = consultantData.find(item => item.consultant === value);
             if (selectedConsultant) {
@@ -231,7 +231,7 @@ function Consultant_Timing() {
             }
             return;
         }
-        
+
         setConsultantInfo({ ...consultantInfo, [name]: value });
     };
 
@@ -274,7 +274,7 @@ function Consultant_Timing() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-3 sm:p-4 md:p-6 lg:p-8 print:bg-white print:p-0">
             <div className="mx-auto">
-                <div className="overflow-x-auto rounded-lg p-10">
+                <div className="overflow-x-auto rounded-lg p-5 lg:p-10">
                     <div className="border bg-white rounded py-5 px-5 mb-6">
                         <div className="flex space justify-between ">
                             <h1 className="text-3xl font-bold text-gray-800 mb-3 print:mb-2">
@@ -288,27 +288,27 @@ function Consultant_Timing() {
                                     <label className="block text-sm font-medium text-gray-700 print:text-black">
                                         Consultant <span className="text-red-500">*</span>
                                     </label>
-                                    
+
                                     {/* Custom dropdown with search */}
                                     <div className="relative">
-                                        <div 
+                                        <div
                                             onClick={handleDropdownToggle}
                                             className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 cursor-pointer flex justify-between items-center"
                                         >
                                             <span className={consultantInfo.consultant ? "text-gray-900" : "text-gray-400"}>
                                                 {consultantInfo.consultant || "Select Consultant"}
                                             </span>
-                                            <svg 
-                                                className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? "transform rotate-180" : ""}`} 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                viewBox="0 0 24 24" 
+                                            <svg
+                                                className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? "transform rotate-180" : ""}`}
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
                                                 xmlns="http://www.w3.org/2000/svg"
                                             >
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </div>
-                                        
+
                                         {isDropdownOpen && (
                                             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
                                                 {/* Search input */}
@@ -323,7 +323,7 @@ function Consultant_Timing() {
                                                         autoFocus
                                                     />
                                                 </div>
-                                                
+
                                                 {/* Consultant list */}
                                                 <div className="py-1">
                                                     {filteredConsultants.length > 0 ? (
@@ -348,7 +348,7 @@ function Consultant_Timing() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 print:grid-cols-4 print:gap-2">
                                 <div className="col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 print:text-black">
@@ -377,7 +377,7 @@ function Consultant_Timing() {
                                     />
                                 </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-4 gap-5">
                                 <div className="col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 print:text-black">
@@ -435,7 +435,28 @@ function Consultant_Timing() {
                                         type="text"
                                     />
                                 </div>
+                               
                             </div>
+                             <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mb-8">
+                                    <button
+                                        onClick={""}
+                                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
+                                    >
+                                        New
+                                    </button>
+                                    <button
+                                        onClick={""}
+                                        className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+                                    >
+                                        Save 
+                                    </button>
+                                    <button
+                                        onClick={""}
+                                        className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                                    >
+                                        Print
+                                    </button>
+                                </div>
                         </div>
                     </div>
 
@@ -513,13 +534,12 @@ function Consultant_Timing() {
                                         </td>
                                         <td className="px-2 py-1 whitespace-nowrap">
                                             {consultant.fee ? (
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                    consultant.fee === 'New' ? 'bg-green-100 text-green-800' :
-                                                    consultant.fee === 'Modify' ? 'bg-yellow-100 text-yellow-800' :
-                                                    consultant.fee === 'Delete' ? 'bg-red-100 text-red-800' :
-                                                    consultant.fee === 'Exit' ? 'bg-purple-100 text-purple-800' :
-                                                    'bg-gray-100 text-gray-800'
-                                                }`}>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${consultant.fee === 'New' ? 'bg-green-100 text-green-800' :
+                                                        consultant.fee === 'Modify' ? 'bg-yellow-100 text-yellow-800' :
+                                                            consultant.fee === 'Delete' ? 'bg-red-100 text-red-800' :
+                                                                consultant.fee === 'Exit' ? 'bg-purple-100 text-purple-800' :
+                                                                    'bg-gray-100 text-gray-800'
+                                                    }`}>
                                                     {consultant.fee === 'New' && (
                                                         <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
