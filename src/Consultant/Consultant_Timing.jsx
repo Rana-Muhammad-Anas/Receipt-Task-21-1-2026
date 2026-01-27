@@ -280,36 +280,36 @@ const ConsultantsTable = ({ consultants, onSelect, selectedId }) => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 <button onClick={() => handleSort('sr')} className="flex items-center hover:text-blue-600 transition-colors">
                                     SR.# <SortIcon columnKey="sr" />
                                 </button>
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 <button onClick={() => handleSort('consultant')} className="flex items-center hover:text-blue-600 transition-colors">
                                     CONSULTANT <SortIcon columnKey="consultant" />
                                 </button>
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                                 <button onClick={() => handleSort('speciality')} className="flex items-center hover:text-blue-600 transition-colors">
                                     SPECIALITY <SortIcon columnKey="speciality" />
                                 </button>
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
                                 <button onClick={() => handleSort('days')} className="flex items-center hover:text-blue-600 transition-colors">
                                     AVAILABLE DAYS <SortIcon columnKey="days" />
                                 </button>
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden xl:table-cell">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden xl:table-cell">
                                 TIMINGS
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden 2xl:table-cell">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden 2xl:table-cell">
                                 CONTACT
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 FEE
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 STATUS
                             </th>
                         </tr>
@@ -321,35 +321,28 @@ const ConsultantsTable = ({ consultants, onSelect, selectedId }) => {
                                 onClick={() => onSelect(consultant)}
                                 className={`hover:bg-blue-50 transition-colors duration-150 cursor-pointer ${selectedId === consultant.sr ? 'bg-blue-50' : ''}`}
                             >
-                                <td className="px-4 py-3 whitespace-nowrap">
+                                <td className="px-4 py-2 whitespace-nowrap">
                                     <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-medium text-sm">
                                         {consultant.sr}
                                     </span>
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-4 py-2">
                                     <div className="flex items-center">
-                                        <div className="flex-shrink-0">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-                                                <span className="text-white text-xs font-bold">
-                                                    {consultant.consultant.split(' ').map(n => n[0]).join('')}
-                                                </span>
-                                            </div>
-                                        </div>
                                         <div className="ml-3">
                                             <div className="text-sm font-semibold text-gray-900">{consultant.consultant}</div>
                                             <div className="text-xs text-gray-500 md:hidden">{consultant.speciality}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-4 py-3 hidden md:table-cell">
+                                <td className="px-4 py-2 hidden md:table-cell">
                                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                         {consultant.speciality}
                                     </span>
                                 </td>
-                                <td className="px-4 py-3 hidden lg:table-cell">
+                                <td className="px-4 py-2 hidden lg:table-cell">
                                     <div className="text-sm text-gray-700">{consultant.days}</div>
                                 </td>
-                                <td className="px-4 py-3 hidden xl:table-cell">
+                                <td className="px-4 py-2 hidden xl:table-cell">
                                     <div className="flex items-center text-sm text-gray-700">
                                         <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -357,7 +350,7 @@ const ConsultantsTable = ({ consultants, onSelect, selectedId }) => {
                                         {consultant.timings}
                                     </div>
                                 </td>
-                                <td className="px-4 py-3 hidden 2xl:table-cell">
+                                <td className="px-4 py-2 hidden 2xl:table-cell">
                                     <div className="text-sm text-gray-700 flex items-center">
                                         <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -365,12 +358,12 @@ const ConsultantsTable = ({ consultants, onSelect, selectedId }) => {
                                         {consultant.contact}
                                     </div>
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap">
+                                <td className="px-4 py-2 whitespace-nowrap">
                                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">
                                         Rs. {consultant.fee}
                                     </span>
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-4 py-2">
                                     <div className="flex items-center">
                                         <div className={`w-2 h-2 rounded-full mr-2 ${consultant.days.includes('Monday - Saturday') ? 'bg-green-500' : 'bg-yellow-500'}`} />
                                         <span className="text-xs text-gray-600">
@@ -564,7 +557,7 @@ function Consultant_Timing() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
-                                Consultant Schedule Management
+                                Consultant Timings
                             </h1>
                         </div>
                         <DateTime />
