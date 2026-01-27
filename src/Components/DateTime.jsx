@@ -31,4 +31,4 @@ function DateTime() {
     )
 }
 
-export default DateTime
+export default DateTime;
