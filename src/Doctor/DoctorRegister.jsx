@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import DateTime from "../Components/DateTime";
 
 // Custom hook for doctor form state management
@@ -11,12 +11,17 @@ const useDoctorForm = () => {
     mobile: "",
     surgeonType: "",
     isAnesthetist: false,
+    isSurgeon: false,
+    isActiveForIndoor: false,
+    isActiveForOPD: false,
     opdServices: [],
     opdCharges: "",
     indoorServices: [],
     indoorCharges: "",
     indoorShareType: "percentage",
     indoorShareValue: "",
+    opdShareType: "percentage",
+    opdShareValue: "",
   };
 
   const [doctorInfo, setDoctorInfo] = useState(initialDoctorInfo);
@@ -82,9 +87,8 @@ const InputField = ({ label, name, value, onChange, required, placeholder, type 
         </div>
       )}
       <input
-        className={`w-full px-3 py-2 ${icon ? 'pl-10' : 'pl-3'} border rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
-          props.disabled ? 'bg-gray-50 cursor-not-allowed' : ''
-        }`}
+        className={`w-full px-3 py-2 ${icon ? 'pl-10' : 'pl-3'} border rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${props.disabled ? 'bg-gray-50 cursor-not-allowed' : ''
+          }`}
         name={name}
         value={value}
         onChange={onChange}
@@ -142,15 +146,80 @@ const ToggleSwitch = ({ label, name, checked, onChange, className = "" }) => (
           onChange={onChange}
           className="sr-only"
         />
-        <div className={`w-12 h-6 rounded-full transition-colors duration-300 ${
-          checked ? 'bg-blue-600' : 'bg-gray-300'
-        }`} />
-        <div className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-          checked ? 'translate-x-6' : ''
-        }`} />
+        <div className={`w-12 h-6 rounded-full transition-colors duration-300 ${checked ? 'bg-blue-600' : 'bg-gray-300'
+          }`} />
+        <div className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-6' : ''
+          }`} />
       </div>
       <span className="ml-3 text-sm font-medium text-gray-700">{label}</span>
     </label>
+  </div>
+);
+
+// Charges Configuration Component
+const ChargesConfiguration = ({ 
+  title, 
+  shareType, 
+  shareValue, 
+  onShareTypeChange, 
+  onShareValueChange, 
+  shareTypeName,
+  shareValueName,
+  className = "" 
+}) => (
+  <div className={`bg-gray-50 rounded-lg p-4 ${className}`}>
+    <h4 className="text-sm font-medium text-gray-700 mb-3">{title}</h4>
+    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id={`${shareTypeName}-percentage`}
+            name={shareTypeName}
+            value="percentage"
+            checked={shareType === "percentage"}
+            onChange={onShareTypeChange}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+          />
+          <label htmlFor={`${shareTypeName}-percentage`} className="ml-2 text-sm text-gray-700">
+            On Percentage
+          </label>
+        </div>
+
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id={`${shareTypeName}-amount`}
+            name={shareTypeName}
+            value="amount"
+            checked={shareType === "amount"}
+            onChange={onShareTypeChange}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+          />
+          <label htmlFor={`${shareTypeName}-amount`} className="ml-2 text-sm text-gray-700">
+            Amount per Case
+          </label>
+        </div>
+      </div>
+
+      <div className="sm:flex-1">
+        <div className="relative">
+          <input
+            name={shareValueName}
+            value={shareValue}
+            onChange={onShareValueChange}
+            placeholder={shareType === "percentage" ? "Enter percentage" : "Enter amount"}
+            type="number"
+            className="w-full px-3 py-2 pl-3 border rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+          {shareType === "percentage" && (
+            <div className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+              %
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   </div>
 );
 
@@ -166,18 +235,23 @@ const ServiceManagement = ({
   onRemoveService,
   chargesName,
   serviceType = "opd",
+  shareType,
+  shareValue,
+  onShareTypeChange,
+  onShareValueChange,
+  shareTypeName,
+  shareValueName,
 }) => (
-  <div className="bg-white rounded-xl shadow-lg p-6 ">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+  <div className="bg-white rounded-xl shadow-lg p-6 pb-0">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
       <h2 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">{title}</h2>
       <div className="text-sm text-gray-600">
         {services.length} service{services.length !== 1 ? 's' : ''} added
       </div>
     </div>
 
-    <div className="mb-6">
-      <h3 className="text-lg font-medium text-gray-700 mb-3">Add New Service</h3>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-4">
+    <div className="mb-3">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-2">
         <div className="lg:col-span-2">
           <InputField
             value={newService}
@@ -190,15 +264,7 @@ const ServiceManagement = ({
             }
           />
         </div>
-        <div>
-          <input
-            type="text"
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50 text-gray-500 text-sm cursor-not-allowed"
-            placeholder="Editable"
-            readOnly
-          />
-        </div>
-        <div>
+        <div className="col-span-2">
           <InputField
             name={chargesName}
             value={charges}
@@ -223,6 +289,17 @@ const ServiceManagement = ({
       </div>
     </div>
 
+    {/* Charges Configuration Section */}
+    <ChargesConfiguration
+      shareType={shareType}
+      shareValue={shareValue}
+      onShareTypeChange={onShareTypeChange}
+      onShareValueChange={onShareValueChange}
+      shareTypeName={shareTypeName}
+      shareValueName={shareValueName}
+      className="mb-6"
+    />
+
     {services.length > 0 && (
       <div className="bg-gray-50 rounded-lg p-4">
         <h4 className="text-sm font-medium text-gray-600 mb-3">Added Services</h4>
@@ -235,7 +312,7 @@ const ServiceManagement = ({
                 className="ml-2 p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                 aria-label="Remove service"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -412,70 +489,6 @@ const ActionButtons = ({ onReset, onSave, onPrint }) => (
   </div>
 );
 
-// Modern Indoor Charges Component
-const IndoorChargesSection = ({ doctorInfo, handleInputChange }) => (
-  <div className="bg-white rounded-xl shadow-lg p-6 mt-0">
-    <h3 className="text-lg font-bold text-gray-800 mb-4">Indoor Charges Configuration</h3>
-    
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-2">
-          <InputField
-            placeholder="Editable"
-            readOnly
-            disabled
-          />
-        </div>
-        
-        <div className="lg:col-span-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="percentage"
-                  name="indoorShareType"
-                  value="percentage"
-                  checked={doctorInfo.indoorShareType === "percentage"}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="percentage" className="ml-2 text-sm text-gray-700">
-                  On Percentage
-                </label>
-              </div>
-              
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="amount"
-                  name="indoorShareType"
-                  value="amount"
-                  checked={doctorInfo.indoorShareType === "amount"}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="amount" className="ml-2 text-sm text-gray-700">
-                  Fixed Amount
-                </label>
-              </div>
-            </div>
-            
-            <InputField
-              name="indoorShareValue"
-              value={doctorInfo.indoorShareValue}
-              onChange={handleInputChange}
-              placeholder={doctorInfo.indoorShareType === "percentage" ? "Enter percentage" : "Enter amount"}
-              type="number"
-              className="sm:flex-1"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
 // Main Component
 function DoctorRegistration() {
   const {
@@ -521,13 +534,6 @@ function DoctorRegistration() {
     { value: "SENIOR MEDICAL OFFICE", label: "Senior Medical Office" },
   ];
 
-  const surgeonTypeOptions = [
-    { value: "", label: "Select Surgeon Type" },
-    { value: "Surgeon", label: "Surgeon" },
-    { value: "Anesthetist", label: "Anesthetist" },
-    { value: "Both", label: "Both Surgeon & Anesthetist" },
-  ];
-
   const handleAddOpdService = () => {
     setNewOpdService(addService("opdServices", newOpdService));
   };
@@ -560,13 +566,13 @@ function DoctorRegistration() {
 
     setDoctorsList([...doctorsList, newDoctor]);
     resetForm();
-    
+
     // Show success notification
     const notification = document.createElement('div');
     notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slideIn';
     notification.textContent = 'Doctor saved successfully!';
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
       notification.classList.remove('animate-slideIn');
       notification.classList.add('animate-slideOut');
@@ -577,13 +583,13 @@ function DoctorRegistration() {
   const handleDeleteDoctor = (id) => {
     if (window.confirm("Are you sure you want to delete this doctor?")) {
       setDoctorsList((prev) => prev.filter((doctor) => doctor.id !== id));
-      
+
       // Show delete notification
       const notification = document.createElement('div');
       notification.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slideIn';
       notification.textContent = 'Doctor deleted successfully!';
       document.body.appendChild(notification);
-      
+
       setTimeout(() => {
         notification.classList.remove('animate-slideIn');
         notification.classList.add('animate-slideOut');
@@ -624,7 +630,7 @@ function DoctorRegistration() {
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
       document.head.removeChild(style);
     };
@@ -633,7 +639,6 @@ function DoctorRegistration() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header with Breadcrumb */}
         <header className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -641,7 +646,7 @@ function DoctorRegistration() {
                 Doctor Registration
               </h1>
             </div>
-            <DateTime/>
+            <DateTime />
           </div>
         </header>
 
@@ -737,32 +742,34 @@ function DoctorRegistration() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SelectField
-                  label="Surgeon Type"
-                  name="surgeonType"
-                  value={doctorInfo.surgeonType}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 ">
+                <ToggleSwitch
+                  label="Surgeon"
+                  name="isSurgeon"
+                  checked={doctorInfo.isSurgeon}
                   onChange={handleInputChange}
-                  options={surgeonTypeOptions}
-                  placeholder="Select surgeon type"
-                  icon={
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  }
                 />
 
-                <div className="flex items-center justify-between pt-8">
-                  <ToggleSwitch
-                    label="Anesthetist"
-                    name="isAnesthetist"
-                    checked={doctorInfo.isAnesthetist}
-                    onChange={handleInputChange}
-                  />
-                  <div className="text-sm text-gray-500">
-                    {doctorInfo.isAnesthetist ? "Registered as anesthetist" : "Not anesthetist"}
-                  </div>
-                </div>
+                <ToggleSwitch
+                  label="Anesthetist"
+                  name="isAnesthetist"
+                  checked={doctorInfo.isAnesthetist}
+                  onChange={handleInputChange}
+                />
+
+                <ToggleSwitch
+                  label="Active for OPD"
+                  name="isActiveForOPD"
+                  checked={doctorInfo.isActiveForOPD}
+                  onChange={handleInputChange}
+                />
+
+                <ToggleSwitch
+                  label="Active for Indoor"
+                  name="isActiveForIndoor"
+                  checked={doctorInfo.isActiveForIndoor}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
           </div>
@@ -780,7 +787,13 @@ function DoctorRegistration() {
               onAddService={handleAddOpdService}
               onRemoveService={handleRemoveOpdService}
               chargesName="opdCharges"
-              serviceType="OPD"
+              serviceType="opd"
+              shareType={doctorInfo.opdShareType}
+              shareValue={doctorInfo.opdShareValue}
+              onShareTypeChange={handleInputChange}
+              onShareValueChange={handleInputChange}
+              shareTypeName="opdShareType"
+              shareValueName="opdShareValue"
             />
 
             {/* Indoor Services */}
@@ -795,14 +808,14 @@ function DoctorRegistration() {
               onRemoveService={handleRemoveIndoorService}
               chargesName="indoorCharges"
               serviceType="indoor"
+              shareType={doctorInfo.indoorShareType}
+              shareValue={doctorInfo.indoorShareValue}
+              onShareTypeChange={handleInputChange}
+              onShareValueChange={handleInputChange}
+              shareTypeName="indoorShareType"
+              shareValueName="indoorShareValue"
             />
           </div>
-
-          {/* Indoor Charges Configuration */}
-          <IndoorChargesSection
-            doctorInfo={doctorInfo}
-            handleInputChange={handleInputChange}
-          />
 
           {/* Action Buttons */}
           <ActionButtons

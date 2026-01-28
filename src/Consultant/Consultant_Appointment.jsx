@@ -407,7 +407,7 @@ function Consultant_Appointment() {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="relative" ref={dropdownRef}>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
@@ -486,7 +486,7 @@ function Consultant_Appointment() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                             </svg>
@@ -509,7 +509,7 @@ function Consultant_Appointment() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Consultation Fee <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
@@ -527,7 +527,7 @@ function Consultant_Appointment() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Follow-Up Visit Charges
                                         </label>
                                         <div className="relative">
@@ -547,7 +547,7 @@ function Consultant_Appointment() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Available Days
                                         </label>
                                         <div className="relative">
@@ -565,7 +565,7 @@ function Consultant_Appointment() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Timings
                                         </label>
                                         <div className="relative">
@@ -583,7 +583,7 @@ function Consultant_Appointment() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Hospital
                                         </label>
                                         <div className="relative">
@@ -614,7 +614,7 @@ function Consultant_Appointment() {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                                     <div className="col-span-1 sm:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Patient Name <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
@@ -632,7 +632,7 @@ function Consultant_Appointment() {
                                     </div>
                                     
                                     <div className="col-span-1">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Contact No. <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
@@ -684,7 +684,7 @@ function Consultant_Appointment() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Address
                                         </label>
                                         <div className="relative">
@@ -703,7 +703,7 @@ function Consultant_Appointment() {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                                             Preferred Appointment Time
                                         </label>
                                         <div className="relative">
