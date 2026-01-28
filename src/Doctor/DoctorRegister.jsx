@@ -36,21 +36,30 @@ const useDoctorForm = () => {
     }));
   };
 
-  const addService = (serviceType, service) => {
+  const addService = (serviceType, service, charges, shareType, shareValue) => {
     if (service.trim()) {
+      const newService = {
+        id: Date.now(),
+        name: service.trim(),
+        charges: charges || "",
+        type: serviceType === "opdServices" ? "OPD" : "Indoor",
+        shareType: shareType,
+        shareValue: shareValue,
+      };
+      
       setDoctorInfo((prev) => ({
         ...prev,
-        [serviceType]: [...prev[serviceType], service.trim()],
+        [serviceType]: [...prev[serviceType], newService],
       }));
       return "";
     }
     return service;
   };
 
-  const removeService = (serviceType, index) => {
+  const removeService = (serviceType, id) => {
     setDoctorInfo((prev) => ({
       ...prev,
-      [serviceType]: prev[serviceType].filter((_, i) => i !== index),
+      [serviceType]: prev[serviceType].filter((service) => service.id !== id),
     }));
   };
 
@@ -157,15 +166,15 @@ const ToggleSwitch = ({ label, name, checked, onChange, className = "" }) => (
 );
 
 // Charges Configuration Component
-const ChargesConfiguration = ({ 
-  title, 
-  shareType, 
-  shareValue, 
-  onShareTypeChange, 
-  onShareValueChange, 
+const ChargesConfiguration = ({
+  title,
+  shareType,
+  shareValue,
+  onShareTypeChange,
+  onShareValueChange,
   shareTypeName,
   shareValueName,
-  className = "" 
+  className = ""
 }) => (
   <div className={`bg-gray-50 rounded-lg p-4 ${className}`}>
     <h4 className="text-sm font-medium text-gray-700 mb-3">{title}</h4>
@@ -299,61 +308,124 @@ const ServiceManagement = ({
       shareValueName={shareValueName}
       className="mb-6"
     />
-
-    {services.length > 0 && (
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="text-sm font-medium text-gray-600 mb-3">Added Services</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {services.map((service, index) => (
-            <div key={index} className="flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
-              <span className="text-sm text-gray-800 truncate">{service}</span>
-              <button
-                onClick={() => onRemoveService(index)}
-                className="ml-2 p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                aria-label="Remove service"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
   </div>
 );
 
-// Modern Doctors Table Component
-const DoctorsTable = ({ doctors, onDelete }) => {
-  const [sortConfig, setSortConfig] = useState({ key: 'consultant', direction: 'ascending' });
+// Services Table Component for the right side
+const ServicesTable = ({ services, onRemoveService }) => {
+  const allServices = [
+    ...services.opdServices.map(service => ({ 
+      ...service, 
+      originalType: "opdServices"
+    })),
+    ...services.indoorServices.map(service => ({ 
+      ...service, 
+      originalType: "indoorServices"
+    }))
+  ];
 
-  const handleSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+  const getShareDisplay = (service) => {
+    if (service.shareType === "percentage") {
+      return `${service.shareValue || 0}%`;
+    } else if (service.shareType === "amount") {
+      return `Rs. ${service.shareValue || 0}`;
     }
-    setSortConfig({ key, direction });
+    return "N/A";
   };
 
-  const sortedDoctors = [...doctors].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === 'ascending' ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === 'ascending' ? 1 : -1;
-    }
-    return 0;
-  });
+  return (
+    <div className="bg-white rounded-xl shadow-lg p-6 max-h-[430px] min-h-[430px] overflow-y-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">Added Services</h2>
+        <div className="text-sm text-gray-600">
+          Total: {allServices.length} service{allServices.length !== 1 ? 's' : ''}
+        </div>
+      </div>
 
-  const SortIcon = ({ columnKey }) => (
-    <span className="ml-1">
-      {sortConfig.key === columnKey ? (
-        sortConfig.direction === 'ascending' ? '↑' : '↓'
-      ) : '↕'}
-    </span>
+      <div className="overflow-x-auto overflow-y-auto  rounded-lg border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+            <tr>
+              <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Sr.#
+              </th>
+              <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Type
+              </th>
+              <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Service 
+              </th>
+              <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Amount
+              </th>
+              <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Share
+              </th>
+              <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {allServices.map((service, index) => (
+              <tr key={service.id} className="hover:bg-blue-50 transition-colors duration-150">
+                <td className="px-2 py-1 whitespace-nowrap">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-medium text-sm">
+                    {index + 1}
+                  </span>
+                </td>
+                <td className="px-2 py-1">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                    service.type === "OPD" 
+                      ? "bg-green-100 text-green-800" 
+                      : "bg-purple-100 text-purple-800"
+                  }`}>
+                    {service.type}
+                  </span>
+                </td>
+                <td className="px-2 py-1">
+                  <div className="text-sm font-semibold text-gray-900">{service.name}</div>
+                </td>
+                <td className="px-2 py-1">
+                  <div className="text-sm font-medium text-gray-900">
+                    {service.charges ? `Rs. ${service.charges}` : "N/A"}
+                  </div>
+                </td>
+                <td className="px-2 py-1">
+                  <div className="text-sm font-medium text-gray-900">
+                    {getShareDisplay(service)}
+                  </div>
+                </td>
+                <td className="px-2 py-1">
+                  <button
+                    onClick={() => onRemoveService(service.originalType, service.id)}
+                    className="inline-flex items-center px-2 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {allServices.length === 0 && (
+        <div className="text-center py-12">
+          <svg className="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">No services added yet</h3>
+        </div>
+      )}
+    </div>
   );
+};
 
+// Modern Doctors Table Component
+const DoctorsTable = ({ doctors, onDelete }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
@@ -367,56 +439,50 @@ const DoctorsTable = ({ doctors, onDelete }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                <button onClick={() => handleSort('id')} className="flex items-center hover:text-blue-600">
-                  Sr.# <SortIcon columnKey="id" />
-                </button>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Sr.#
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                <button onClick={() => handleSort('consultant')} className="flex items-center hover:text-blue-600">
-                  CONSULTANT <SortIcon columnKey="consultant" />
-                </button>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                CONSULTANT
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
-                <button onClick={() => handleSort('department')} className="flex items-center hover:text-blue-600">
-                  DEPARTMENT <SortIcon columnKey="department" />
-                </button>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                DEPARTMENT
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
                 PHONE
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 MOBILE
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedDoctors.map((doctor, index) => (
+            {doctors.map((doctor, index) => (
               <tr key={doctor.id} className="hover:bg-blue-50 transition-colors duration-150">
-                <td className="px-4 py-3 whitespace-nowrap">
+                <td className="px-2 py-2 whitespace-nowrap">
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-medium text-sm">
                     {index + 1}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-2 py-2">
                   <div className="text-sm font-semibold text-gray-900">{doctor.consultant}</div>
                 </td>
-                <td className="px-4 py-3 hidden md:table-cell">
+                <td className="px-2 py-2 hidden md:table-cell">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                     {doctor.department}
                   </span>
                 </td>
-                <td className="px-4 py-3 hidden lg:table-cell">
+                <td className="px-2 py-2 hidden lg:table-cell">
                   <div className="text-sm text-gray-700">
                     {doctor.phone || (
                       <span className="text-gray-400 italic">Not provided</span>
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-2 py-2">
                   <div className="text-sm font-medium text-gray-900 flex items-center">
                     <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -426,7 +492,7 @@ const DoctorsTable = ({ doctors, onDelete }) => {
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-2 py-2">
                   <button
                     onClick={() => onDelete(doctor.id)}
                     className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
@@ -535,19 +601,23 @@ function DoctorRegistration() {
   ];
 
   const handleAddOpdService = () => {
-    setNewOpdService(addService("opdServices", newOpdService));
+    setNewOpdService(addService("opdServices", newOpdService, doctorInfo.opdCharges, doctorInfo.opdShareType, doctorInfo.opdShareValue));
   };
 
   const handleAddIndoorService = () => {
-    setNewIndoorService(addService("indoorServices", newIndoorService));
+    setNewIndoorService(addService("indoorServices", newIndoorService, doctorInfo.indoorCharges, doctorInfo.indoorShareType, doctorInfo.indoorShareValue));
   };
 
-  const handleRemoveOpdService = (index) => {
-    removeService("opdServices", index);
+  const handleRemoveOpdService = (id) => {
+    removeService("opdServices", id);
   };
 
-  const handleRemoveIndoorService = (index) => {
-    removeService("indoorServices", index);
+  const handleRemoveIndoorService = (id) => {
+    removeService("indoorServices", id);
+  };
+
+  const handleRemoveService = (serviceType, id) => {
+    removeService(serviceType, id);
   };
 
   const handleSaveDoctor = () => {
@@ -562,6 +632,12 @@ function DoctorRegistration() {
       department: doctorInfo.department,
       phone: doctorInfo.residencePhone,
       mobile: doctorInfo.mobile,
+      opdServices: doctorInfo.opdServices,
+      indoorServices: doctorInfo.indoorServices,
+      opdShareType: doctorInfo.opdShareType,
+      opdShareValue: doctorInfo.opdShareValue,
+      indoorShareType: doctorInfo.indoorShareType,
+      indoorShareValue: doctorInfo.indoorShareValue,
     };
 
     setDoctorsList([...doctorsList, newDoctor]);
@@ -627,6 +703,27 @@ function DoctorRegistration() {
       }
       .animate-slideOut {
         animation: slideOut 0.3s ease-in;
+      }
+
+      @media print {
+        body * {
+          display: hidden;
+        }
+
+        .print-area, .print-area * {
+          display: visible;
+        }
+
+        .print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+
+        button {
+          display: none !important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -775,46 +872,55 @@ function DoctorRegistration() {
           </div>
 
           {/* Services Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* OPD Services */}
-            <ServiceManagement
-              title="OPD Services"
-              services={doctorInfo.opdServices}
-              newService={newOpdService}
-              setNewService={setNewOpdService}
-              charges={doctorInfo.opdCharges}
-              onChargesChange={handleInputChange}
-              onAddService={handleAddOpdService}
-              onRemoveService={handleRemoveOpdService}
-              chargesName="opdCharges"
-              serviceType="opd"
-              shareType={doctorInfo.opdShareType}
-              shareValue={doctorInfo.opdShareValue}
-              onShareTypeChange={handleInputChange}
-              onShareValueChange={handleInputChange}
-              shareTypeName="opdShareType"
-              shareValueName="opdShareValue"
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3">
+              {/* OPD Services */}
+              <ServiceManagement
+                title="OPD Services"
+                services={doctorInfo.opdServices}
+                newService={newOpdService}
+                setNewService={setNewOpdService}
+                charges={doctorInfo.opdCharges}
+                onChargesChange={handleInputChange}
+                onAddService={handleAddOpdService}
+                onRemoveService={handleRemoveOpdService}
+                chargesName="opdCharges"
+                serviceType="opd"
+                shareType={doctorInfo.opdShareType}
+                shareValue={doctorInfo.opdShareValue}
+                onShareTypeChange={handleInputChange}
+                onShareValueChange={handleInputChange}
+                shareTypeName="opdShareType"
+                shareValueName="opdShareValue"
+              />
 
-            {/* Indoor Services */}
-            <ServiceManagement
-              title="Indoor Services"
-              services={doctorInfo.indoorServices}
-              newService={newIndoorService}
-              setNewService={setNewIndoorService}
-              charges={doctorInfo.indoorCharges}
-              onChargesChange={handleInputChange}
-              onAddService={handleAddIndoorService}
-              onRemoveService={handleRemoveIndoorService}
-              chargesName="indoorCharges"
-              serviceType="indoor"
-              shareType={doctorInfo.indoorShareType}
-              shareValue={doctorInfo.indoorShareValue}
-              onShareTypeChange={handleInputChange}
-              onShareValueChange={handleInputChange}
-              shareTypeName="indoorShareType"
-              shareValueName="indoorShareValue"
-            />
+              {/* Indoor Services */}
+              <ServiceManagement
+                title="Indoor Services"
+                services={doctorInfo.indoorServices}
+                newService={newIndoorService}
+                setNewService={setNewIndoorService}
+                charges={doctorInfo.indoorCharges}
+                onChargesChange={handleInputChange}
+                onAddService={handleAddIndoorService}
+                onRemoveService={handleRemoveIndoorService}
+                chargesName="indoorCharges"
+                serviceType="indoor"
+                shareType={doctorInfo.indoorShareType}
+                shareValue={doctorInfo.indoorShareValue}
+                onShareTypeChange={handleInputChange}
+                onShareValueChange={handleInputChange}
+                shareTypeName="indoorShareType"
+                shareValueName="indoorShareValue"
+              />
+            </div>
+            
+            <div className="lg:col-span-2">
+              <ServicesTable 
+                services={doctorInfo} 
+                onRemoveService={handleRemoveService} 
+              />
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -825,7 +931,9 @@ function DoctorRegistration() {
           />
 
           {/* Doctors Table */}
-          <DoctorsTable doctors={doctorsList} onDelete={handleDeleteDoctor} />
+          <div className="print-area">
+            <DoctorsTable doctors={doctorsList} onDelete={handleDeleteDoctor} />
+          </div>
         </div>
       </div>
     </div>
