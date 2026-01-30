@@ -1,3 +1,159 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Remove scroll bar */
+.fc-scroller {
+    overflow: hidden !important;
+}
+
+/* Header buttons */
+.fc-button {
+    @apply bg-blue-500 text-white rounded px-2 py-1 !important;
+    /* Tailwind */
+}
+
+.fc-button:hover {
+    @apply bg-blue-700 !important;
+
+}
+
+
+/* Events */
+.fc-event {
+    @apply bg-green-500 text-white rounded px-1 py-0.5 !important;
+}
+
+.fc-header-toolbar .fc-button-group>.fc-button+.fc-button {
+    margin-left: 0.5rem;
+    /* Tailwind's spacing: 2 = 0.5rem */
+}
+
+
+/* Calendar selected date styling */
+.selected-date-highlight {
+  background-color: #3b82f6 !important; /* Blue-600 */
+  color: white !important;
+  border: 2px solid #1d4ed8 !important; /* Blue-700 border */
+  border-radius: 0.375rem !important;
+  font-weight: 600 !important;
+}
+
+
+/* Today's date styling */
+.fc-day-today {
+  background-color: #74e6a3 !important; /* Light blue */
+}
+
+/* Calendar cell general styling */
+.fc-day {
+  border: 1px solid #e5e7eb !important;
+}
+
+
+/* Calendar responsive styles */
+.calendar-container {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .fc .fc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .fc .fc-toolbar-title {
+    font-size: 1.2rem;
+    margin: 10px 0;
+  }
+  
+  .fc .fc-button {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+  
+  .fc .fc-daygrid-day {
+    min-height: 50px;
+  }
+  
+  .fc .fc-daygrid-day-number {
+    font-size: 0.75rem;
+    padding: 4px;
+  }
+  
+  .fc .fc-col-header-cell {
+    padding: 8px 0;
+  }
+  
+  .fc .fc-col-header-cell-cushion {
+    font-size: 0.75rem;
+    padding: 4px;
+  }
+  
+  .fc-day.selected-date .fc-daygrid-day-number {
+    font-weight: bold;
+  }
+}
+
+/* Tablet optimizations */
+@media (max-width: 1024px) {
+  .fc .fc-toolbar {
+    flex-wrap: wrap;
+  }
+  
+  .fc .fc-toolbar-title {
+    font-size: 1.3rem;
+  }
+  
+  .fc .fc-button {
+    padding: 8px 14px;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+  .fc {
+    padding: 10px;
+  }
+  
+  .fc .fc-daygrid-day {
+    min-height: 80px;
+  }
+  
+  .fc .fc-daygrid-day-number {
+    font-size: 0.875rem;
+  }
+}
+
+/* Ensure calendar doesn't overflow */
+.fc {
+  max-width: 100%;
+}
+
+.fc-view-harness {
+  min-height: 400px;
+}
+
+/* Selected date styling */
+.fc-day.selected-date {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+.fc-day.selected-date .fc-daygrid-day-number {
+  color: white !important;
+  font-weight: bold;
+}
+
+/* Today's date styling */
+.fc-day-today {
+  background-color: #dbeafe !important;
+}
+
+/* Hover effects */
+.fc-day:hover {
+  cursor: pointer;
+}

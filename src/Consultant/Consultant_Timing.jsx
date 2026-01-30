@@ -153,7 +153,7 @@ const SearchDropdown = ({
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
-            <div className="relative">
+            <div className="relative w-1/2">
                 <div
                     onClick={() => setIsOpen(!isOpen)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer flex justify-between items-center transition-all duration-200"
@@ -181,7 +181,7 @@ const SearchDropdown = ({
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search consultant or speciality..."
-                                    className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-3 py-2  border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     autoFocus
                                 />
                                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -566,7 +566,7 @@ function Consultant_Timing() {
 
                 <div className="space-y-6">
                     {/* Consultant Information Card */}
-                    <div className="bg-white rounded-2xl shadow-xl p-6">
+                    <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border-l-4 sm:border-l-8 border-blue-600">
                         <div className="flex items-center mb-6">
                             <div className="flex-shrink-0">
                                 <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">

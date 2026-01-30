@@ -22,6 +22,8 @@ const useDoctorForm = () => {
     indoorShareValue: "",
     opdShareType: "percentage",
     opdShareValue: "",
+    opdAmountEditable: false,
+    indoorAmountEditable: false,
   };
 
   const [doctorInfo, setDoctorInfo] = useState(initialDoctorInfo);
@@ -46,7 +48,7 @@ const useDoctorForm = () => {
         shareType: shareType,
         shareValue: shareValue,
       };
-      
+
       setDoctorInfo((prev) => ({
         ...prev,
         [serviceType]: [...prev[serviceType], newService],
@@ -165,19 +167,43 @@ const ToggleSwitch = ({ label, name, checked, onChange, className = "" }) => (
   </div>
 );
 
+// Toggle Checkbox Component
+const ToggleCheckbox = ({ label, name, checked, onChange, className = "" }) => (
+  <div className={`flex items-center ${className}`}>
+    <label className="flex items-center space-x-2 cursor-pointer">
+      <div className="relative">
+        <input
+          type="checkbox"
+          name={name}
+          checked={checked}
+          onChange={onChange}
+          className="sr-only"
+        />
+        <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}>
+          <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-5' : ''}`}></div>
+        </div>
+      </div>
+      <span className="text-sm font-medium text-gray-700">{label}</span>
+    </label>
+  </div>
+);
+
 // Charges Configuration Component
 const ChargesConfiguration = ({
-  title,
+  shareCat,
   shareType,
   shareValue,
+  amountEditable,
   onShareTypeChange,
   onShareValueChange,
+  onAmountEditableChange,
   shareTypeName,
   shareValueName,
+  amountEditableName,
   className = ""
 }) => (
-  <div className={`bg-gray-50 rounded-lg p-4 ${className}`}>
-    <h4 className="text-sm font-medium text-gray-700 mb-3">{title}</h4>
+  <div className={`rounded-lg ${className}`}>
+    <h4 className="text-sm font-medium text-gray-700 ">{shareCat} Services Share</h4>
     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
       <div className="flex items-center space-x-4">
         <div className="flex items-center">
@@ -191,7 +217,7 @@ const ChargesConfiguration = ({
             className="h-4 w-4 text-blue-600 focus:ring-blue-500"
           />
           <label htmlFor={`${shareTypeName}-percentage`} className="ml-2 text-sm text-gray-700">
-            On Percentage
+            In %Age
           </label>
         </div>
 
@@ -228,6 +254,15 @@ const ChargesConfiguration = ({
           )}
         </div>
       </div>
+      
+      <div className="flex items-center">
+        <ToggleCheckbox
+          label="Amount Editable"
+          name={amountEditableName}
+          checked={amountEditable}
+          onChange={onAmountEditableChange}
+        />
+      </div>
     </div>
   </div>
 );
@@ -246,20 +281,23 @@ const ServiceManagement = ({
   serviceType = "opd",
   shareType,
   shareValue,
+  amountEditable,
   onShareTypeChange,
   onShareValueChange,
+  onAmountEditableChange,
   shareTypeName,
   shareValueName,
+  amountEditableName,
 }) => (
-  <div className="bg-white rounded-xl shadow-lg p-6 pb-0">
+  <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
-      <h2 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">{title}</h2>
+      <h2 className="text-xl font-bold text-gray-800 mb-2 sm:mb-0">{title} Services</h2>
       <div className="text-sm text-gray-600">
         {services.length} service{services.length !== 1 ? 's' : ''} added
       </div>
     </div>
 
-    <div className="mb-3">
+    <div className="">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-2">
         <div className="lg:col-span-2">
           <InputField
@@ -300,13 +338,17 @@ const ServiceManagement = ({
 
     {/* Charges Configuration Section */}
     <ChargesConfiguration
+      shareCat={title}
       shareType={shareType}
       shareValue={shareValue}
+      amountEditable={amountEditable}
       onShareTypeChange={onShareTypeChange}
       onShareValueChange={onShareValueChange}
+      onAmountEditableChange={onAmountEditableChange}
       shareTypeName={shareTypeName}
       shareValueName={shareValueName}
-      className="mb-6"
+      amountEditableName={amountEditableName}
+      className=""
     />
   </div>
 );
@@ -314,12 +356,12 @@ const ServiceManagement = ({
 // Services Table Component for the right side
 const ServicesTable = ({ services, onRemoveService }) => {
   const allServices = [
-    ...services.opdServices.map(service => ({ 
-      ...service, 
+    ...services.opdServices.map(service => ({
+      ...service,
       originalType: "opdServices"
     })),
-    ...services.indoorServices.map(service => ({ 
-      ...service, 
+    ...services.indoorServices.map(service => ({
+      ...service,
       originalType: "indoorServices"
     }))
   ];
@@ -353,7 +395,7 @@ const ServicesTable = ({ services, onRemoveService }) => {
                 Type
               </th>
               <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                Service 
+                Service
               </th>
               <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Amount
@@ -375,11 +417,10 @@ const ServicesTable = ({ services, onRemoveService }) => {
                   </span>
                 </td>
                 <td className="px-2 py-1">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    service.type === "OPD" 
-                      ? "bg-green-100 text-green-800" 
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${service.type === "OPD"
+                      ? "bg-green-100 text-green-800"
                       : "bg-purple-100 text-purple-800"
-                  }`}>
+                    }`}>
                     {service.type}
                   </span>
                 </td>
@@ -435,7 +476,7 @@ const DoctorsTable = ({ doctors, onDelete }) => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <div className="overflow-x-auto max-h-[50vh] overflow-auto rounded-lg border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
             <tr>
@@ -638,6 +679,8 @@ function DoctorRegistration() {
       opdShareValue: doctorInfo.opdShareValue,
       indoorShareType: doctorInfo.indoorShareType,
       indoorShareValue: doctorInfo.indoorShareValue,
+      opdAmountEditable: doctorInfo.opdAmountEditable,
+      indoorAmountEditable: doctorInfo.indoorAmountEditable,
     };
 
     setDoctorsList([...doctorsList, newDoctor]);
@@ -749,7 +792,7 @@ function DoctorRegistration() {
 
         <div className="space-y-6">
           {/* Doctor Information Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-6">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border-l-4 sm:border-l-8 border-blue-600">
             <div className="flex items-center mb-6">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -876,7 +919,7 @@ function DoctorRegistration() {
             <div className="lg:col-span-3">
               {/* OPD Services */}
               <ServiceManagement
-                title="OPD Services"
+                title="OPD"
                 services={doctorInfo.opdServices}
                 newService={newOpdService}
                 setNewService={setNewOpdService}
@@ -888,15 +931,18 @@ function DoctorRegistration() {
                 serviceType="opd"
                 shareType={doctorInfo.opdShareType}
                 shareValue={doctorInfo.opdShareValue}
+                amountEditable={doctorInfo.opdAmountEditable}
                 onShareTypeChange={handleInputChange}
                 onShareValueChange={handleInputChange}
+                onAmountEditableChange={handleInputChange}
                 shareTypeName="opdShareType"
                 shareValueName="opdShareValue"
+                amountEditableName="opdAmountEditable"
               />
 
               {/* Indoor Services */}
               <ServiceManagement
-                title="Indoor Services"
+                title="Indoor"
                 services={doctorInfo.indoorServices}
                 newService={newIndoorService}
                 setNewService={setNewIndoorService}
@@ -908,17 +954,20 @@ function DoctorRegistration() {
                 serviceType="indoor"
                 shareType={doctorInfo.indoorShareType}
                 shareValue={doctorInfo.indoorShareValue}
+                amountEditable={doctorInfo.indoorAmountEditable}
                 onShareTypeChange={handleInputChange}
                 onShareValueChange={handleInputChange}
+                onAmountEditableChange={handleInputChange}
                 shareTypeName="indoorShareType"
                 shareValueName="indoorShareValue"
+                amountEditableName="indoorAmountEditable"
               />
             </div>
-            
+
             <div className="lg:col-span-2">
-              <ServicesTable 
-                services={doctorInfo} 
-                onRemoveService={handleRemoveService} 
+              <ServicesTable
+                services={doctorInfo}
+                onRemoveService={handleRemoveService}
               />
             </div>
           </div>

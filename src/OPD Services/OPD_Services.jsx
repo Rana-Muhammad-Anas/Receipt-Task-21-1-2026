@@ -307,7 +307,7 @@ const OPD_Services = () => {
                         </div>
 
                         {/* OPD Services Table */}
-                        <div className="bg-white overflow-y-auto max-h-[60vh] rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 print:shadow-none print:border print:p-4">
+                        <div className="bg-white overflow-y-auto max-h-[60vh] rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border-l-4 sm:border-l-8 border-blue-600 print:shadow-none print:border print:p-4">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 print:mb-3">
                                 <h3 className="text-xl font-bold text-gray-800 print:text-black">
                                     OPD Services <span className="text-red-500">*</span>
