@@ -18,12 +18,6 @@
 
 }
 
-
-/* Events */
-.fc-event {
-    @apply bg-green-500 text-white rounded px-1 py-0.5 !important;
-}
-
 .fc-header-toolbar .fc-button-group>.fc-button+.fc-button {
     margin-left: 0.5rem;
     /* Tailwind's spacing: 2 = 0.5rem */
@@ -157,3 +151,41 @@
 .fc-day:hover {
   cursor: pointer;
 }
+
+/* Add to your global CSS or component CSS */
+.timeline-container {
+    height: 35vh;;
+}
+
+/* @media (max-width: 768px) {
+    .timeline-container {
+        min-height: 400px;
+    }
+} */
+
+/* Smooth transitions for events */
+.event-transition {
+    transition: top 0.3s ease, height 0.3s ease;
+}
+
+/* Scrollbar styling for timeline */
+.timeline-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.timeline-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+
+

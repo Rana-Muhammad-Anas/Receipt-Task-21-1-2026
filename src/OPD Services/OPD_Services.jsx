@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import DateTime from "../Components/DateTime";
+import {useForm} from 'react-hook-form' 
 
 const OPD_Services = () => {
-    const [payment, setPayment] = useState(0);
     const [errors, setErrors] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -38,21 +38,14 @@ const OPD_Services = () => {
 
     const [services, setServices] = useState(initialOpdServices);
     const [selectedServices, setSelectedServices] = useState([]);
-    const [discount, setDiscount] = useState(0);
     const [opdInfo, setOpdInfo] = useState({
         name: "",
         amount: "",
-        isFirstVisit: false,
-        amountEditable: false,
-        requireConsultant: false,
+        amountEditable: true,
+        requireConsultant: true,
         allowOpdService: true,
         isLarge: false
     });
-
-    const totalAmount = selectedServices.reduce((sum, service) => sum + service.amount, 0);
-    const discountedAmount = totalAmount - discount;
-    const paymentNum = parseInt(payment) || 0;
-    const balance = discountedAmount - paymentNum;
 
     // Filter services based on search term
     const filteredServices = searchTerm.trim() === ""
@@ -118,19 +111,44 @@ const OPD_Services = () => {
         );
     };
 
-    const handleDiscountChange = (e) => {
-        let value = e.target.value;
-        value = value.replace(/^0+(?=\d)/, "");
-        if (value === "" || parseInt(value) < 0) value = "0";
-        if (parseInt(value) > totalAmount) value = totalAmount.toString();
-        setDiscount(value);
-    };
-
-    const handlePaymentChange = (e) => {
-        let value = e.target.value;
-        value = value.replace(/^0+(?=\d)/, "");
-        if (value === "" || parseInt(value) < 0) value = "0";
-        setPayment(value);
+    // NEW FUNCTION: Handle Add Service button click
+    const handleAddService = () => {
+        // Validate required fields
+        if (!opdInfo.name.trim()) {
+            setErrors(prev => ({ ...prev, name: "OPD Service name is required" }));
+            return;
+        }
+        
+        if (!opdInfo.amount.trim()) {
+            setErrors(prev => ({ ...prev, amount: "Amount is required" }));
+            return;
+        }
+        
+        // Clear any existing errors
+        setErrors(prev => ({ ...prev, name: null, amount: null }));
+        
+        // Prepare the data object to log to console
+        const serviceData = {
+            serviceName: opdInfo.name,
+            amount: opdInfo.amount,
+            isAmountEditable: opdInfo.amountEditable,
+            isRequireConsultant: opdInfo.requireConsultant,
+            isAllowOPDService: opdInfo.allowOpdService,
+            isLargeOPDReceipt: opdInfo.isLarge
+        };
+        
+        // Log to console
+        console.log("Service Data:", serviceData);
+         // Optional: Show success message
+        alert(`Service "${opdInfo.name}" added successfully! Check console for details.`);
+        setOpdInfo({
+            name: "",
+            amount: "",
+            amountEditable: true,
+            requireConsultant: false,
+            allowOpdService: true,
+            isLarge: false
+        });
     };
 
     const handleSearchChange = (e) => {
@@ -141,31 +159,10 @@ const OPD_Services = () => {
         setSearchTerm("");
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!opdInfo.name.trim()) newErrors.name = "OPD Service name is required";
-        if (!opdInfo.amount.trim()) newErrors.amount = "Amount is required";
-        if (selectedServices.length === 0) {
-            newErrors.services = "Please select at least one service";
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+   
 
     const handlePrint = () => {
-        if (!validateForm()) {
-            alert("Please fill all required fields correctly before printing.");
-            return;
-        }
         window.print();
-    };
-
-    const handleSaveExit = () => {
-        if (!validateForm()) {
-            alert("Please fill all required fields correctly before saving.");
-            return;
-        }
-        alert("Receipt saved successfully!");
     };
 
     return (
@@ -199,7 +196,20 @@ const OPD_Services = () => {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-5 print:gap-2">
                                     <div className="col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 print:text-black">
-                                            OPD Service <span className="text-red-500">*</span>
+                                            Service <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                                            name="name"
+                                            value={opdInfo.subname}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter Any OPD Service"
+                                        />
+                                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                                            Main Service <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
@@ -223,6 +233,14 @@ const OPD_Services = () => {
                                             type="number"
                                         />
                                         {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
+                                    </div>
+                                    <div className="flex items-center">
+                                        <button
+                                            onClick={handleAddService} // Updated to use handleAddService
+                                            className="px-2 py-1 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                                        >
+                                            + Add Service
+                                        </button>
                                     </div>
                                 </div>
 
@@ -256,6 +274,7 @@ const OPD_Services = () => {
                                                     checked={opdInfo.requireConsultant}
                                                     onChange={handleCheckBoxes}
                                                     className="sr-only"
+                                                    
                                                 />
                                                 <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${opdInfo.requireConsultant ? 'bg-blue-600' : 'bg-gray-300'}`}>
                                                     <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${opdInfo.requireConsultant ? 'translate-x-5' : ''}`}></div>
@@ -310,10 +329,27 @@ const OPD_Services = () => {
                         <div className="bg-white overflow-y-auto max-h-[60vh] rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border-l-4 sm:border-l-8 border-blue-600 print:shadow-none print:border print:p-4">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 print:mb-3">
                                 <h3 className="text-xl font-bold text-gray-800 print:text-black">
-                                    OPD Services <span className="text-red-500">*</span>
+                                    OPD Services
                                 </h3>
-                                <div className="text-sm text-gray-600 mt-1 sm:mt-0 print:text-gray-700">
-                                    {selectedServices.length} services selected
+                                <div className="flex flex-col sm:flex-row justify-end gap-3">
+                                    <button
+                                        // onClick={onNew}
+                                        className="px-2 py-1 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
+                                    >
+                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        New Service
+                                    </button>
+                                    <button
+                                        onClick={handlePrint}
+                                        className="px-2 py-1 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                                    >
+                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                        Print Services
+                                    </button>
                                 </div>
                             </div>
                             {errors.services && (
@@ -380,6 +416,9 @@ const OPD_Services = () => {
                                             </th>
                                             <th scope="col" className="px-3 py-2 text-left text-xs font-bold text-white uppercase tracking-wider w-32">
                                                 ALLOWED
+                                            </th>
+                                            <th scope="col" className="px-3 py-2 text-left text-xs font-bold text-white uppercase tracking-wider w-32">
+                                                ACTIONS
                                             </th>
                                         </tr>
                                     </thead>
@@ -476,6 +515,24 @@ const OPD_Services = () => {
                                                             </span>
                                                         )}
                                                     </td>
+                                                    <td className="px-2 py-1">
+                                                        <button
+                                                            // onClick={() => onRemoveService(service.originalType, service.id)}
+                                                            className="inline-flex items-center px-2 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                                                        >
+                                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            // onClick={() => onEditService(service.originalType, service.id)}
+                                                            className="inline-flex items-center px-2 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                                                        >
+                                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             );
                                         })}
@@ -508,8 +565,6 @@ const OPD_Services = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Right Column - Summary */}
                 </div>
             </div>
         </div>

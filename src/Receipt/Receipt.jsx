@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import axios from "axios";
 import firstAid from "../../public/first-aid.png";
 import consulting from "../../public/consulting.png";
 import laboratory from "../../public/laboratory.png";
@@ -8,14 +10,11 @@ import DateTime from "../Components/DateTime";
 
 const Receipt = () => {
   const [activeTab, setActiveTab] = useState('OPD');
-
-
-  const [activeSummary, setActiveSummary] = useState('Summary')
-  const [payment, setPayment] = useState(0);
-  const [errors, setErrors] = useState({}); // State for validation errors
-  const [receiptNo, setReceiptNo] = useState(""); // State for receipt number
-  const [mrNo, setMrNo] = useState(""); // State for MR number
-  const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [activeSummary, setActiveSummary] = useState('Summary');
+  const [receiptNo, setReceiptNo] = useState("");
+  const [mrNo, setMrNo] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initial services data
   const initialServices = [
@@ -28,21 +27,41 @@ const Receipt = () => {
 
   const [services, setServices] = useState(initialServices);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [discount, setDiscount] = useState(0);
-  const [patientInfo, setPatientInfo] = useState({
-    name: "",
-    address: "",
-    age: "",
-    gender: "",
-    phone: "",
-    reference: "General Physician",
-    panel: "",
-    city: "",
+
+  // Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+    trigger,
+    reset
+  } = useForm({
+    defaultValues: {
+      name: "",
+      address: "",
+      age: "",
+      gender: "",
+      phone: "",
+      reference: "General Physician",
+      panel: "",
+      city: "",
+      discount: 0,
+      payment: 0,
+      selectedServiceIds: []
+    }
   });
 
+  // Watch form values
+  const watchDiscount = watch("discount", 0);
+  const watchPayment = watch("payment", 0);
+  const formValues = watch();
+
+  // Calculate totals
   const totalAmount = selectedServices.reduce((sum, service) => sum + service.price, 0);
-  const discountedAmount = totalAmount - discount;
-  const paymentNum = parseInt(payment) || 0;
+  const discountedAmount = totalAmount - parseInt(watchDiscount || 0);
+  const paymentNum = parseInt(watchPayment || 0);
   const balance = discountedAmount - paymentNum;
 
   // Filter services based on search term
@@ -56,7 +75,11 @@ const Receipt = () => {
   useEffect(() => {
     const selected = services.filter((service) => service.selected);
     setSelectedServices(selected);
-  }, [services]);
+    
+    // Update selected service IDs in form
+    const selectedIds = selected.map(service => service.id);
+    setValue("selectedServiceIds", selectedIds);
+  }, [services, setValue]);
 
   const toggleService = (id) => {
     setServices(
@@ -64,25 +87,22 @@ const Receipt = () => {
         service.id === id ? { ...service, selected: !service.selected } : service
       )
     );
-    // Clear service selection error when user selects a service
-    if (errors.services) {
-      setErrors({ ...errors, services: null });
-    }
   };
 
   const handleInputChange = (e) => {
-    let { name, value } = e.target;
-    if (name === "gender") {
-      const v = value.toLowerCase();
-      if (v === "m" || v === "male") value = "Male";
-      else if (v === "f" || v === "female") value = "Female";
-      else value = value.charAt(0).toUpperCase() + value.slice(1);
-    }
-    setPatientInfo({ ...patientInfo, [name]: value });
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: null });
-    }
+    const { name, value } = e.target;
+    setValue(name, value);
+    
+    // Trigger validation for the changed field
+    trigger(name);
+  };
+
+  const handleReceiptNoChange = (e) => {
+    setReceiptNo(e.target.value);
+  };
+
+  const handleMrNoChange = (e) => {
+    setMrNo(e.target.value);
   };
 
   const handleDeleteService = (serviceId) => {
@@ -96,34 +116,6 @@ const Receipt = () => {
       )
     );
   };
-  const handleReceiptNoChange = (e) => {
-    setReceiptNo(e.target.value);
-    if (errors.receiptNo) {
-      setErrors({ ...errors, receiptNo: null });
-    }
-  };
-
-  const handleMrNoChange = (e) => {
-    setMrNo(e.target.value);
-    if (errors.mrNo) {
-      setErrors({ ...errors, mrNo: null });
-    }
-  };
-
-  const handleDiscountChange = (e) => {
-    let value = e.target.value;
-    value = value.replace(/^0+(?=\d)/, "");
-    if (value === "" || parseInt(value) < 0) value = "0";
-    if (parseInt(value) > totalAmount) value = totalAmount.toString();
-    setDiscount(value);
-  };
-
-  const handlePaymentChange = (e) => {
-    let value = e.target.value;
-    value = value.replace(/^0+(?=\d)/, "");
-    if (value === "" || parseInt(value) < 0) value = "0";
-    setPayment(value);
-  };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -133,56 +125,115 @@ const Receipt = () => {
     setSearchTerm("");
   };
 
-  // Validation function
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Check required fields
-    if (!receiptNo.trim()) newErrors.receiptNo = "Receipt No. is required";
-    if (!mrNo.trim()) newErrors.mrNo = "MR No. is required";
-    if (!patientInfo.name.trim()) newErrors.name = "Patient name is required";
-    if (!patientInfo.address.trim()) newErrors.address = "Address is required";
-    if (!patientInfo.age.trim()) newErrors.age = "Age is required";
-    if (!patientInfo.gender.trim()) newErrors.gender = "Gender is required";
-    if (!patientInfo.phone.trim()) newErrors.phone = "Phone number is required";
-
-    // Validate phone number format (11 digits)
-    if (patientInfo.phone.trim() && !/^\d{11}$/.test(patientInfo.phone.trim())) {
-      newErrors.phone = "Phone must be 11 digits";
+  // Handle form submission
+  const onSubmit = async (data) => {
+    // Additional validation
+    if (!receiptNo.trim()) {
+      alert("Please enter Receipt No.");
+      return;
     }
-
-    // Validate age (must be number between 1-120)
-    if (patientInfo.age.trim()) {
-      const ageNum = parseInt(patientInfo.age);
-      if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
-        newErrors.age = "Age must be between 1 and 120";
-      }
+    
+    if (!mrNo.trim()) {
+      alert("Please enter MR No.");
+      return;
     }
-
-    // Check if at least one service is selected
+    
     if (selectedServices.length === 0) {
-      newErrors.services = "Please select at least one service";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handlePrint = () => {
-    if (!validateForm()) {
-      alert("Please fill all required fields correctly before printing.");
+      alert("Please select at least one service");
       return;
     }
+
+    // Prepare the data for submission
+    const submissionData = {
+      ...data,
+      receiptNo: receiptNo.trim(),
+      mrNo: mrNo.trim(),
+      services: selectedServices,
+      totalAmount,
+      discountedAmount,
+      payment: paymentNum,
+      balance,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log("Submitting data:", submissionData);
+
+    setIsSubmitting(true);
+    try {
+      // Replace with your actual API endpoint
+      const response = await axios.post("YOUR_BACKEND_API_ENDPOINT", submissionData);
+      
+      if (response.status === 200 || response.status === 201) {
+        alert("Receipt saved successfully!");
+        // Reset form
+        reset();
+        setReceiptNo("");
+        setMrNo("");
+        setServices(initialServices);
+        setSearchTerm("");
+      } else {
+        alert("Failed to save receipt. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert(`Error: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onSaveExit = async () => {
+    // Validate all fields before submission
+    const isValid = await trigger();
+    
+    if (!isValid) {
+      alert("Please fix all validation errors before saving.");
+      return;
+    }
+    
+    if (!receiptNo.trim()) {
+      alert("Please enter Receipt No.");
+      return;
+    }
+    
+    if (!mrNo.trim()) {
+      alert("Please enter MR No.");
+      return;
+    }
+    
+    if (selectedServices.length === 0) {
+      alert("Please select at least one service");
+      return;
+    }
+
+    await handleSubmit(onSubmit)();
+  };
+
+  const onPrint = async () => {
+    // Validate all fields before printing
+    const isValid = await trigger();
+    
+    if (!isValid) {
+      alert("Please fix all validation errors before printing.");
+      return;
+    }
+    
+    if (!receiptNo.trim()) {
+      alert("Please enter Receipt No.");
+      return;
+    }
+    
+    if (!mrNo.trim()) {
+      alert("Please enter MR No.");
+      return;
+    }
+    
+    if (selectedServices.length === 0) {
+      alert("Please select at least one service");
+      return;
+    }
+
     window.print();
-  };
-
-  const handleSaveExit = () => {
-    if (!validateForm()) {
-      alert("Please fill all required fields correctly before saving.");
-      return;
-    }
-    // Save logic here
-    alert("Receipt saved successfully!");
   };
 
   return (
@@ -247,133 +298,153 @@ const Receipt = () => {
                     {errors.mrNo && <p className="text-red-500 text-xs mt-1">{errors.mrNo}</p>}
                   </div>
                 </div>
-                <div className="space-y-3 print:space-y-2">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-5 print:gap-2">
-                    <div className="col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Full Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-                        name="name"
-                        value={patientInfo.name}
-                        onChange={handleInputChange}
-                        placeholder="Enter patient name"
-                      />
-                      {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                
+                <form id="receipt-form">
+                  <div className="space-y-3 print:space-y-2">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-5 print:gap-2">
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Full Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                          {...register("name", { 
+                            required: "Patient name is required"
+                          })}
+                          onChange={handleInputChange}
+                          placeholder="Enter patient name"
+                        />
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                      </div>
+                      <div className="col-span-1">
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Phone <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className={`w-full p-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                          {...register("phone", { 
+                            required: "Phone number is required",
+                            pattern: {
+                              value: /^\d{11}$/,
+                              message: "Phone must be 11 digits"
+                            }
+                          })}
+                          onChange={handleInputChange}
+                          placeholder="11 digit phone number"
+                          type="tel"
+                          maxLength="11"
+                        />
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+                      </div>
                     </div>
-                    <div className="col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Phone <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        className={`w-full p-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
-                        name="phone"
-                        value={patientInfo.phone}
-                        onChange={handleInputChange}
-                        placeholder="11 digit phone number"
-                        type="tel"
-                        maxLength="11"
-                      />
-                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 print:grid-cols-4 print:gap-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Age <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+                          {...register("age", { 
+                            required: "Age is required",
+                            min: {
+                              value: 1,
+                              message: "Age must be at least 1"
+                            },
+                            max: {
+                              value: 120,
+                              message: "Age cannot exceed 120"
+                            }
+                          })}
+                          onChange={handleInputChange}
+                          placeholder="Age (1-120)"
+                          type="number"
+                          min="1"
+                          max="120"
+                        />
+                        {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age.message}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Gender <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
+                          {...register("gender", { 
+                            required: "Gender is required"
+                          })}
+                          onChange={handleInputChange}
+                          placeholder="M/F For Male/Female"
+                        />
+                        {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>}
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 print:grid-cols-4 print:gap-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Age <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
-                        name="age"
-                        value={patientInfo.age}
-                        onChange={handleInputChange}
-                        placeholder="Age (1-120)"
-                        type="number"
-                        min="1"
-                        max="120"
-                      />
-                      {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Gender <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
-                        name="gender"
-                        value={patientInfo.gender}
-                        onChange={handleInputChange}
-                        placeholder="M/F For Male/Female"
-                      />
-                      {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-5">
-                    <div className="col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Address <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
-                        name="address"
-                        value={patientInfo.address}
-                        onChange={handleInputChange}
-                        placeholder="Enter address"
-                      />
-                      {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-                    </div>
+                    <div className="grid grid-cols-4 gap-5">
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Address <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                          {...register("address", { 
+                            required: "Address is required"
+                          })}
+                          onChange={handleInputChange}
+                          placeholder="Enter address"
+                        />
+                        {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
+                      </div>
 
-                    <div className="col-span-1 ">
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        City
-                      </label>
-                      <input
-                        className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
-                        name="city"
-                        value={patientInfo.city}
-                        onChange={handleInputChange}
-                        placeholder="Enter City"
-                        type="name"
-                      />
-                      {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                      <div className="col-span-1 ">
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          City
+                        </label>
+                        <input
+                          className={`w-full px-3 py-1 border rounded-lg text-gray-900 bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0 ${errors.city ? 'border-red-500' : 'border-gray-300'}`}
+                          {...register("city")}
+                          onChange={handleInputChange}
+                          placeholder="Enter City"
+                        />
+                        {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Panel
+                        </label>
+                        <select
+                          {...register("panel")}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
+                        >
+                          <option value="">Select Panel</option>
+                          <option value="General Physician">General Physician</option>
+                          <option value="Dentist">Dentist</option>
+                          <option value="Ophthalmologist">Ophthalmologist</option>
+                          <option value="General Surgeon">General Surgeon</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 print:text-black">
+                          Reference <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          {...register("reference", { 
+                            required: "Reference is required"
+                          })}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
+                        >
+                          <option value="General Physician">General Physician</option>
+                          <option value="Dentist">Dentist</option>
+                          <option value="Ophthalmologist">Ophthalmologist</option>
+                          <option value="General Surgeon">General Surgeon</option>
+                        </select>
+                        {errors.reference && <p className="text-red-500 text-xs mt-1">{errors.reference.message}</p>}
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Panel <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        name="panel"
-                        value={patientInfo.panel}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
-                      >
-                        <option value="General Physician">General Physician</option>
-                        <option value="Dentist">Dentist</option>
-                        <option value="Ophthalmologist">Ophthalmologist</option>
-                        <option value="General Surgeon">General Surgeon</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 print:text-black">
-                        Reference <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        name="reference"
-                        value={patientInfo.reference}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-1 border border-gray-300 rounded-lg bg-[#edf9ff] text-sm sm:text-base print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0"
-                      >
-                        <option value="General Physician">General Physician</option>
-                        <option value="Dentist">Dentist</option>
-                        <option value="Ophthalmologist">Ophthalmologist</option>
-                        <option value="General Surgeon">General Surgeon</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
+                </form>
               </div>
             </div>
 
@@ -387,9 +458,9 @@ const Receipt = () => {
                   {selectedServices.length} services selected
                 </div>
               </div>
-              {errors.services && (
+              {selectedServices.length === 0 && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 text-sm font-medium">{errors.services}</p>
+                  <p className="text-red-600 text-sm font-medium">Please select at least one service</p>
                 </div>
               )}
 
@@ -532,9 +603,6 @@ const Receipt = () => {
                   className="px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 font-medium rounded-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-200 text-sm shadow-md hover:shadow-lg active:shadow-sm border border-gray-300"
                   onClick={() => {
                     setServices(services.map((s) => ({ ...s, selected: false })));
-                    if (!errors.services) {
-                      setErrors({ ...errors, services: "Please select at least one service" });
-                    }
                   }}
                 >
                   Clear Selection
@@ -622,7 +690,6 @@ const Receipt = () => {
               <div className="bg-white rounded-lg shadow p-4 min-h-42vh">
                 {activeSummary === 'Summary' && (
                   <div className="flex justify-center">
-
                     <div className="space-y-3 sm:space-y-4 print:space-y-3">
                       <div className="flex justify-between items-center text-sm sm:text-base">
                         <span className="text-gray-700">Services Total</span>
@@ -637,8 +704,17 @@ const Receipt = () => {
                             type="number"
                             min="0"
                             max={totalAmount}
-                            value={discount}
-                            onChange={handleDiscountChange}
+                            {...register("discount", {
+                              min: {
+                                value: 0,
+                                message: "Discount cannot be negative"
+                              },
+                              max: {
+                                value: totalAmount,
+                                message: `Discount cannot exceed total amount (Rs.${totalAmount})`
+                              }
+                            })}
+                            onChange={handleInputChange}
                             className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
                           />
                         </div>
@@ -659,8 +735,13 @@ const Receipt = () => {
                           <input
                             type="number"
                             min="0"
-                            value={payment}
-                            onChange={handlePaymentChange}
+                            {...register("payment", {
+                              min: {
+                                value: 0,
+                                message: "Payment cannot be negative"
+                              }
+                            })}
+                            onChange={handleInputChange}
                             className="w-20 sm:w-24 p-2 border border-gray-300 rounded-lg text-right text-green-600 font-bold text-sm print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:w-20"
                           />
                         </div>
@@ -677,10 +758,7 @@ const Receipt = () => {
                   </div>
                 )}
 
-
-
                 {activeSummary === 'Selected Services' && (
-
                   <>
                     <div className="p-3 border-b border-gray-100">
                       <h4 className="font-semibold text-gray-800">Selected Services List </h4>
@@ -743,17 +821,9 @@ const Receipt = () => {
                         </div>
                       </div>
                     )}
-
-
                   </>
                 )}
               </div>
-
-
-
-
-
-
 
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-2  py-4 print:hidden">
@@ -763,9 +833,10 @@ const Receipt = () => {
                hover:bg-gray-200 transition-colors
                text-sm
                disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleSaveExit}
+                  onClick={onSaveExit}
+                  disabled={isSubmitting}
                 >
-                  Save & Exit
+                  {isSubmitting ? "Saving..." : "Save & Exit"}
                 </button>
 
                 <button
@@ -774,28 +845,29 @@ const Receipt = () => {
                hover:opacity-90 transition-opacity
                text-sm
                disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handlePrint}
+                  onClick={onPrint}
+                  disabled={isSubmitting}
                 >
-                  Print Receipt
+                  {isSubmitting ? "Processing..." : "Print Receipt"}
                 </button>
               </div>
 
-
               {/* Validation Summary */}
               {(() => {
-                const hasErrors = Object.values(errors).some(error => error && error.trim());
+                const formErrors = Object.values(errors).filter(error => error && error.message);
+                const hasErrors = formErrors.length > 0 || !receiptNo.trim() || !mrNo.trim() || selectedServices.length === 0;
 
                 if (hasErrors) {
                   return (
                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-red-600 text-sm font-medium mb-1">Please fix the following errors:</p>
-                      <ul className="text-red-500 text-xs list-disc pl-4">
-                        {Object.entries(errors)
-                          .filter(([_, error]) => error && error.trim())
-                          .map(([key, error]) => (
-                            <li key={key}>{error}</li>
-                          ))
-                        }
+                      <ul className="text-red-500 text-xs list-disc pl-4 space-y-1">
+                        {!receiptNo.trim() && <li>Receipt No. is required</li>}
+                        {!mrNo.trim() && <li>MR No. is required</li>}
+                        {selectedServices.length === 0 && <li>Please select at least one service</li>}
+                        {formErrors.map((error, index) => (
+                          <li key={index}>{error.message}</li>
+                        ))}
                       </ul>
                     </div>
                   );
